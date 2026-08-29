@@ -1,0 +1,50 @@
+<?php
+/**
+ * header.php — 公共头部视图
+ *
+ * 分层：view/（视图模型，只负责展示输出）
+ * 职责：输出 HTML 文档头部（<head> 区域）与公共站点头部导航。
+ *       CSS/JS 一律通过 <link>/<script> 引用 resources/ 下的独立文件，
+ *       此处不书写任何内联样式或脚本（见 AGENTS.md 铁律）。
+ *
+ * 约定：
+ *   - $siteName   站点名称（可选，默认 "Hermes"）
+ *   - $pageTitle  页面标题（可选，默认 "Hermes"）
+ *   - $pageStyles 页面专属 CSS 路径数组（相对站点根）
+ *   - $pageScripts 页面专属 JS 路径数组（相对站点根）
+ */
+
+$siteName    = $siteName    ?? 'Hermes';
+$pageTitle   = $pageTitle   ?? 'Hermes';
+$pageStyles  = $pageStyles  ?? [];
+$pageScripts = $pageScripts ?? [];
+?>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= htmlspecialchars($pageTitle, ENT_QUOTES, 'UTF-8') ?></title>
+
+    <!-- 全局样式：resources/css（按组件/类别存储） -->
+    <link rel="stylesheet" href="resources/css/base.css">
+    <link rel="stylesheet" href="resources/css/header.css">
+    <?php foreach ($pageStyles as $href): ?>
+    <link rel="stylesheet" href="<?= htmlspecialchars($href, ENT_QUOTES, 'UTF-8') ?>">
+    <?php endforeach; ?>
+
+    <!-- 全局脚本：resources/js（defer 延迟执行） -->
+    <script src="resources/js/app.js" defer></script>
+    <?php foreach ($pageScripts as $src): ?>
+    <script src="<?= htmlspecialchars($src, ENT_QUOTES, 'UTF-8') ?>" defer></script>
+    <?php endforeach; ?>
+</head>
+<body>
+<header class="site-header">
+    <div class="container">
+        <a class="brand" href="index.php"><?= htmlspecialchars($siteName, ENT_QUOTES, 'UTF-8') ?></a>
+        <nav class="nav">
+            <a href="index.php">首页</a>
+        </nav>
+    </div>
+</header>

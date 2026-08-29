@@ -1,0 +1,47 @@
+/* ==========================================================================
+   index.css — 首页页面样式
+   类别：页面（index.php 专属：site-main / card / badge / time）
+   ========================================================================== */
+
+.site-main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.card {
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 48px 56px;
+    text-align: center;
+    box-shadow: var(--shadow);
+}
+
+.card h1 {
+    font-size: 3rem;
+    letter-spacing: 2px;
+    background: var(--accent-grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 12px;
+}
+
+.badge {
+    display: inline-block;
+    margin: 8px 4px;
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.badge.green { color: var(--green); border-color: #81c78466; }
+.badge.blue  { color: var(--blue); border-color: #64b5f666; }
+
+.time { margin-top: 20px; font-size: 0.9rem; opacity: 0.75; }

@@ -1,0 +1,38 @@
+/* ==========================================================================
+   header.css — 公共头部组件
+   类别：组件（site-header / brand / nav）
+   ========================================================================== */
+
+.site-header {
+    background: rgba(0, 0, 0, 0.25);
+    border-bottom: 1px solid var(--card-border);
+    padding: 16px 0;
+}
+
+.site-header .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.brand {
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--text-color);
+    text-decoration: none;
+    background: var(--accent-grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.nav a {
+    color: var(--text-color);
+    text-decoration: none;
+    margin-left: 24px;
+    opacity: 0.85;
+    transition: opacity 0.2s;
+}
+
+.nav a:hover { opacity: 1; }
