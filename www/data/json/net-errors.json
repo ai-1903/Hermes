@@ -1,0 +1,94 @@
+{
+  "comment": "常见网络错误码中文解释字典（Online Test 离线提示用）。code 为浏览器 fetch 失败时的网络错误码（Chrome 等经 err.cause.code 暴露；AbortError 为超时）。aliases 为可替代写法/别名。reason 为可能原因，suggest 为给用户的建议。",
+  "version": 1,
+  "errors": [
+    {
+      "code": "AbortError",
+      "aliases": ["ERR_ABORTED", "ERR_TIMED_OUT"],
+      "title": "请求超时",
+      "reason": "等待目标响应超过时限（默认 6 秒）未返回。目标可能离线、网络延迟过高，或防火墙静默丢弃了数据包。",
+      "suggest": "确认目标主机/端口可达，或改用 HTTP 重试。"
+    },
+    {
+      "code": "ERR_NAME_NOT_RESOLVED",
+      "aliases": ["ERR_NAME_RESOLUTION_FAILED"],
+      "title": "DNS 解析失败",
+      "reason": "无法将域名解析为 IP：域名可能不存在、拼写有误，或本机/公共 DNS 暂时不可用。",
+      "suggest": "检查域名拼写，尝试用 IP 直接访问；或稍后重试 / 更换 DNS。"
+    },
+    {
+      "code": "ERR_CONNECTION_REFUSED",
+      "aliases": ["ECONNREFUSED"],
+      "title": "连接被拒绝",
+      "reason": "目标主机可达，但该端口没有服务在监听，或被防火墙/安全组主动拒绝。",
+      "suggest": "确认服务确实运行在指定端口，并检查防火墙/安全组放行。"
+    },
+    {
+      "code": "ERR_CONNECTION_TIMED_OUT",
+      "aliases": ["ETIMEDOUT", "ERR_TIMED_OUT"],
+      "title": "连接超时",
+      "reason": "与目标建立连接超时：目标可能离线、网络不通，或防火墙丢弃了 SYN 包。",
+      "suggest": "检查目标主机是否在线、网络路由是否可达。"
+    },
+    {
+      "code": "ERR_CONNECTION_RESET",
+      "aliases": ["ECONNRESET", "ERR_CONNECTION_CLOSED"],
+      "title": "连接被重置",
+      "reason": "连接建立后被动端主动断开：服务异常、连接数超限，或被中间设备（防火墙/IDS）重置。",
+      "suggest": "确认服务进程健康；若为 HTTPS 端口，确认是否真的是 TLS 服务。"
+    },
+    {
+      "code": "ERR_SSL_PROTOCOL_ERROR",
+      "aliases": ["ERR_SSL_VERSION_OR_CIPHER_MISMATCH"],
+      "title": "SSL/TLS 协议错误",
+      "reason": "在 HTTPS 端口上未协商出有效的 TLS：该端口可能不是 TLS 服务，或协议版本/加密套件不兼容。",
+      "suggest": "确认端口上运行的是 HTTPS 服务；或改用 HTTP 协议检测。"
+    },
+    {
+      "code": "ERR_CERT_AUTHORITY_INVALID",
+      "aliases": ["ERR_CERT_COMMON_NAME_INVALID", "ERR_CERT_DATE_INVALID"],
+      "title": "TLS 证书校验失败",
+      "reason": "目标证书不受信任 / 域名不匹配 / 已过期。no-cors 探测模式下证书问题常表现为连接失败。",
+      "suggest": "确认证书有效；仅用于连通性判断时可忽略证书内容本身。"
+    },
+    {
+      "code": "ERR_ADDRESS_UNREACHABLE",
+      "aliases": ["EHOSTUNREACH", "ENETUNREACH"],
+      "title": "目标不可达",
+      "reason": "网络层无法到达目标地址：IP 不存在、路由不可达，或目标网络隔离。",
+      "suggest": "确认 IP 地址正确且所属网络可达。"
+    },
+    {
+      "code": "ERR_INTERNET_DISCONNECTED",
+      "aliases": ["ERR_NETWORK_CHANGED", "ERR_NO_INTERNET"],
+      "title": "本机网络异常",
+      "reason": "当前设备网络连接断开或正在切换，属于本机环境问题而非目标问题。",
+      "suggest": "检查本机网络连接 / Wi-Fi / 代理设置。"
+    },
+    {
+      "code": "ERR_EMPTY_RESPONSE",
+      "aliases": ["ERR_CONTENT_LENGTH_MISMATCH"],
+      "title": "服务器无响应",
+      "reason": "连接建立后服务器未返回任何数据：服务可能崩溃、挂起，或后端异常。",
+      "suggest": "确认服务进程正常运行。"
+    },
+    {
+      "code": "ERR_UNKNOWN_URL_SCHEME",
+      "title": "不支持的协议",
+      "reason": "输入的协议/地址形式浏览器无法识别（应仅使用 http/https）。",
+      "suggest": "仅输入域名或 IP（可带 :端口），无需带协议前缀。"
+    },
+    {
+      "code": "ERR_BLOCKED_BY_CLIENT",
+      "aliases": ["ERR_BLOCKED_BY_RESPONSE"],
+      "title": "被本机拦截",
+      "reason": "请求被浏览器扩展、广告拦截或安全软件拦截，而非目标不可达。",
+      "suggest": "检查浏览器扩展 / 代理软件是否拦截了该请求。"
+    }
+  ],
+  "fallback": {
+    "title": "无法连接",
+    "reason": "未能与目标建立连接（网络错误码不在常见列表中）。",
+    "suggest": "检查网络连通性、确认目标在线后重试。"
+  }
+}

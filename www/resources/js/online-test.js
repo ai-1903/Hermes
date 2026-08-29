@@ -22,6 +22,59 @@
     var protoTabs   = Array.prototype.slice.call(document.querySelectorAll('.proto-tab'));
     var currentProto = 'https';
 
+    /* ---------- 网络错误码字典（data/json/net-errors.json） ---------- */
+    var ERR_DICT_URL = 'data/json/net-errors.json';
+    var errDict = null;   // 缓存字典
+    var errDictLoaded = false;
+
+    function loadErrDict() {
+        if (errDictLoaded) return Promise.resolve(errDict);
+        return fetch(ERR_DICT_URL, { cache: 'no-store' })
+            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+            .then(function (d) { errDict = d; errDictLoaded = true; return d; })
+            .catch(function () { errDict = null; errDictLoaded = true; return null; });
+    }
+
+    /** 查找错误码对应解释；未命中返回 fallback */
+    function errorHint(code) {
+        if (!errDict || !errDict.errors) return null;
+        var found = null;
+        errDict.errors.forEach(function (e) {
+            if (e.code === code) found = e;
+            if (!found && e.aliases && e.aliases.indexOf(code) !== -1) found = e;
+        });
+        if (found) return found;
+        return errDict.fallback || null;
+    }
+
+    /** 回环 / 离线提示内容 */
+    function loopbackPopOpts() {
+        return {
+            theme: 'info',
+            title: '本地回环',
+            text: '127.0.0.1 是设备自身的回环地址，恒定为可达状态，用于本机服务测试，无需网络探测。',
+        };
+    }
+
+    /** 为离线状态徽标绑定错误码 POP（悬停 + 点击） */
+    function bindOfflinePop(badge, errorCode, isLocal) {
+        if (!window.Hermes.Popover) return;
+        badge.classList.add('st-pop');
+        var hint = errorHint(errorCode);
+        var opts = {
+            theme: 'error',
+            title: (isLocal ? '本地离线' : '离线') + (hint ? ' · ' + hint.title : ''),
+            rows: [
+                { label: '错误码', value: errorCode || '未知' },
+            ],
+        };
+        if (hint) {
+            opts.rows.push({ label: '可能原因', value: hint.reason });
+            opts.rows.push({ label: '建议', value: hint.suggest });
+        }
+        window.Hermes.Popover.bind(badge, opts);
+    }
+
     /* ---------- 协议选项卡 ---------- */
     protoTabs.forEach(function (tab) {
         tab.addEventListener('click', function () {
@@ -89,6 +142,15 @@
             var status = document.createElement('span');
             status.className = 'history-status st ' + label.cls;
             status.textContent = label.text;
+            // 历史中的离线 / 本地离线 / 本地回环同样绑定 POP
+            if (rec.status === 'offline' || rec.status === 'local-offline') {
+                bindOfflinePop(status, rec.error, rec.status === 'local-offline');
+            } else if (rec.status === 'loopback') {
+                status.classList.add('st-pop');
+                if (window.Hermes.Popover) {
+                    window.Hermes.Popover.bind(status, loopbackPopOpts());
+                }
+            }
 
             var time = document.createElement('span');
             time.className = 'history-time';
@@ -151,6 +213,10 @@
             var s = document.createElement('span');
             s.className = 'st ' + label.cls;
             s.textContent = label.text;
+            // 离线 / 本地离线：绑定错误码 POP（悬停 + 点击）
+            if (it.status === 'offline' || it.status === 'local-offline') {
+                bindOfflinePop(s, it.error, it.status === 'local-offline');
+            }
             tdStatus.appendChild(s);
             tr.appendChild(tdTarget);
             tr.appendChild(tdStatus);
@@ -212,7 +278,8 @@
         var hosts = N.SUBDOMAINS.map(function (s) { return s + '.' + root; });
         return hosts.reduce(function (chain, host) {
             return chain.then(function () {
-                return N.detectStatus(currentProto, host, port).then(function (status) {
+                return N.detectStatus(currentProto, host, port).then(function (res) {
+                    var status = res.status;
                     if (status === 'online' || status === 'local-online') {
                         found++;
                         // 动态插入一行
@@ -233,6 +300,7 @@
                             proto: currentProto,
                             host: port ? host + ':' + port : host,
                             status: status,
+                            error: null,
                             time: t,
                         });
                     }
@@ -271,13 +339,16 @@
         var host = target.host;
         var port = target.port;
 
-        // 本地回环：直接显示，不探测
+        // 本地回环：直接显示，不探测（绑定回环提示 POP）
         if (N.isIPv4(host) && N.isLoopback(host)) {
             var sum = document.createElement('div');
-            sum.className = 'result-summary st-loopback';
+            sum.className = 'result-summary st-loopback st-pop';
             sum.textContent = '本地回环';
             result.appendChild(sum);
-            upsertHistory({ proto: currentProto, host: value, status: 'loopback', time: now() });
+            if (window.Hermes.Popover) {
+                window.Hermes.Popover.bind(sum, loopbackPopOpts());
+            }
+            upsertHistory({ proto: currentProto, host: value, status: 'loopback', error: null, time: now() });
             renderHistory();
             return;
         }
@@ -301,8 +372,8 @@
         result.appendChild(loading);
 
         Promise.all(hosts.map(function (h) {
-            return N.detectStatus(currentProto, h, port).then(function (status) {
-                return { target: port ? h + ':' + port : h, host: h, port: port, status: status };
+            return N.detectStatus(currentProto, h, port).then(function (res) {
+                return { target: port ? h + ':' + port : h, host: h, port: port, status: res.status, error: res.error };
             });
         })).then(function (items) {
             btn.disabled = false;
@@ -317,6 +388,7 @@
                     proto: currentProto,
                     host: '*.' + host,
                     status: anyOnline ? 'online' : 'offline',
+                    error: anyOnline ? null : (items[0] && items[0].error),
                     time: t,
                 };
                 upsertHistory(merged);
@@ -326,6 +398,7 @@
                         proto: currentProto,
                         host: it.target,
                         status: it.status,
+                        error: it.error,
                         time: t,
                     });
                 });
@@ -338,4 +411,5 @@
     input.addEventListener('keydown', function (e) { if (e.key === 'Enter') run(); });
 
     renderHistory();
+    loadErrDict();   // 预加载错误码字典，供离线 POP 使用
 })();

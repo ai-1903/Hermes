@@ -122,6 +122,15 @@
      * 注：no-cors 模式下 fetch 在「连接成功」时即 resolve（含 403/404），
      *     仅在 DNS 失败 / 连接拒绝 / 超时时 reject。
      */
+    /** 从 fetch 异常中提取可读网络错误码（Chrome 等在 cause.code 中暴露） */
+    Network.errorCode = function (err) {
+        if (err && err.cause && err.cause.code) return String(err.cause.code);
+        if (err && err.code) return String(err.code);
+        if (err && err.name === 'AbortError') return 'AbortError';
+        if (err && /abort/i.test(err.message || '')) return 'AbortError';
+        return 'UNKNOWN';
+    };
+
     Network.probe = function (protocol, host, port, timeoutMs) {
         var timeout = timeoutMs || 6000;
         return new Promise(function (resolve) {
@@ -135,29 +144,36 @@
                 signal: ctrl.signal,
             }).then(function () {
                 clearTimeout(timer);
-                resolve(true);
-            }).catch(function () {
+                resolve({ ok: true, error: null });
+            }).catch(function (err) {
                 clearTimeout(timer);
-                resolve(false);
+                resolve({ ok: false, error: Network.errorCode(err) });
             });
         });
     };
 
     /**
-     * 状态检测：按输入类型返回状态键
+     * 状态检测：按输入类型返回 { status, error }
      *   127.x → loopback（本地回环，不探测）
      *   内网 IP → local-online / local-offline
      *   其余 → online / offline
+     * error：离线时为网络错误码（如 ERR_CONNECTION_REFUSED），在线/回环为 null
      */
     Network.detectStatus = function (protocol, host, port) {
-        if (Network.isLoopback(host)) return Promise.resolve('loopback');
-        if (Network.isPrivateIP(host)) {
-            return Network.probe(protocol, host, port).then(function (ok) {
-                return ok ? 'local-online' : 'local-offline';
-            });
+        if (Network.isLoopback(host)) {
+            return Promise.resolve({ status: 'loopback', error: null });
         }
-        return Network.probe(protocol, host, port).then(function (ok) {
-            return ok ? 'online' : 'offline';
+        return Network.probe(protocol, host, port).then(function (res) {
+            if (Network.isPrivateIP(host)) {
+                return {
+                    status: res.ok ? 'local-online' : 'local-offline',
+                    error: res.error,
+                };
+            }
+            return {
+                status: res.ok ? 'online' : 'offline',
+                error: res.error,
+            };
         });
     };
 
