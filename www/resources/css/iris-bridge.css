@@ -183,7 +183,8 @@
     height: 30px;
 }
 
-/* 按钮本体：固定 30px 圆形图标（不因展开改变尺寸 → 不推挤行内其它元素） */
+/* 按钮本体：固定 30px 圆形图标（不因展开改变尺寸 → 不推挤行内其它元素）
+   悬停时淡出隐藏，让位于右侧的双按钮组 */
 .ir-copy-btn {
     display: flex;
     align-items: center;
@@ -196,7 +197,8 @@
     border: 1px solid var(--border);
     color: var(--text-secondary);
     cursor: pointer;
-    transition: border-color 0.15s, color 0.15s, background 0.15s, box-shadow 0.15s;
+    transition: border-color 0.15s, color 0.15s, background 0.15s, box-shadow 0.15s,
+                opacity 0.18s, visibility 0.18s;
 }
 
 .ir-copy-btn iconify-icon { font-size: 1rem; }
@@ -252,12 +254,19 @@
 
 .ir-copy-opt.copied { color: var(--green); background: rgba(52, 211, 153, 0.16); }
 
-/* 桌面：悬停 / 聚焦时胶囊从按钮右侧滑出 */
+/* 桌面：悬停 / 聚焦时胶囊从按钮右侧滑出，同时单个图标淡出隐藏（变为双按钮） */
 .ir-copy:hover .ir-copy-menu,
 .ir-copy:focus-within .ir-copy-menu {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
+}
+
+.ir-copy:hover .ir-copy-btn,
+.ir-copy:focus-within .ir-copy-btn {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
 }
 
 .ir-copy-btn:hover,
