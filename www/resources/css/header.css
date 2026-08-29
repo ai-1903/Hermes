@@ -31,9 +31,12 @@
     transition: height 0.32s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 展开：容器变高，nav-mega 区域（文档流内）随之露出 */
+/* 展开：高度由内容撑开（JS 测量 scrollHeight 并受上限约束）
+   - PC 端上限 50vh；移动端上限视口高度（可撑到底部）
+   - 内容超高时内部上下滚动（overflow-y: auto）
+   - 收起时回落到 54px */
 .nav-bar.open {
-    height: 320px;
+    overflow-y: auto;
     box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
 }
 
