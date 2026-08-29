@@ -15,9 +15,9 @@ $pageTitle   = '伊里斯桥 — 信息通道连接';
 $pageStyles  = ['resources/css/placeholder.css'];
 $pageScripts = [];
 
-$phIcon = 'fluent:bridge-20-regular';
+$phIcon = 'fluent:color-20-regular';
 $phName = '伊里斯桥';
-$phDesc = '连接信息通道的桥梁，功能正在构建中。';
+$phDesc = '颜色板与色彩编码转换，功能正在构建中。';
 
 require __DIR__ . '/view/header.php';
 require __DIR__ . '/view/placeholder.php';

@@ -15,9 +15,9 @@ $pageTitle   = 'Astraea — 天平与正义';
 $pageStyles  = ['resources/css/placeholder.css'];
 $pageScripts = [];
 
-$phIcon = 'fluent:scale-20-regular';
+$phIcon = 'fluent:shield-checkmark-20-regular';
 $phName = 'Astraea';
-$phDesc = '天平与正义，功能正在构建中。';
+$phDesc = 'MD5 / 哈希等校验工具，功能正在构建中。';
 
 require __DIR__ . '/view/header.php';
 require __DIR__ . '/view/placeholder.php';

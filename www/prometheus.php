@@ -15,9 +15,9 @@ $pageTitle   = '普罗米修斯 — 灵感与火种';
 $pageStyles  = ['resources/css/placeholder.css'];
 $pageScripts = [];
 
-$phIcon = 'fluent:flame-20-regular';
+$phIcon = 'fluent:data-usage-20-regular';
 $phName = '普罗米修斯';
-$phDesc = '灵感的火种，功能正在构建中。';
+$phDesc = 'JSON 等数据文件的可视化编辑，功能正在构建中。';
 
 require __DIR__ . '/view/header.php';
 require __DIR__ . '/view/placeholder.php';
