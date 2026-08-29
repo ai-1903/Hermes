@@ -34,6 +34,26 @@
             return { item: item, btn: btn, panel: panel };
         }).filter(function (e) { return e.btn; });
 
+        /* ---------- 面板按设备重挂载 ----------
+           移动端：把每个二级菜单面板挂到对应一级项内（按钮之后），
+                   使「谁的二级菜单就在谁下面展开」（如网络工具与实用工具之间）。
+           桌面端：保持原结构，面板移回 .nav-mega > .container（文档流撑高容器）。 */
+        var megaContainer = document.querySelector('.nav-mega .container');
+
+        function placePanelsByDevice() {
+            if (!megaContainer) return;
+            entries.forEach(function (e) {
+                if (!e.panel) return;
+                if (isMobile()) {
+                    // 挂到一级项内：按钮之后 → 二级菜单在项正下方
+                    if (e.panel.parentNode !== e.item) e.item.appendChild(e.panel);
+                } else {
+                    // 移回 nav-mega 容器（桌面端效果不变）
+                    if (e.panel.parentNode !== megaContainer) megaContainer.appendChild(e.panel);
+                }
+            });
+        }
+
         /**
          * 按内容实际高度设置容器高度（内容撑开）。
          * 上限：PC 50vh；移动端视口高度。内容超高时内部滚动。
@@ -162,13 +182,22 @@
             if (e.key === 'Escape') collapseNav();
         });
 
-        // 窗口尺寸变化：移动端重新测量撑开；回桌面时收起
+        // 窗口尺寸变化：移动端重新测量撑开；回桌面时收起；设备切换时重挂载面板
+        var lastMobile = isMobile();
         window.addEventListener('resize', function () {
-            if (!isMobile()) {
+            var nowMobile = isMobile();
+            if (nowMobile !== lastMobile) {
+                lastMobile = nowMobile;
+                placePanelsByDevice();   // 跨设备阈值 → 重挂载二级菜单位置
+            }
+            if (!nowMobile) {
                 collapseNav();
             } else if (navBar && navBar.classList.contains('open')) {
                 setHeightToContent();
             }
         });
+
+        // 初始按设备挂载面板位置
+        placePanelsByDevice();
     });
 })();

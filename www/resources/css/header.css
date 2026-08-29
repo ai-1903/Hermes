@@ -254,9 +254,23 @@
         text-align: left;
     }
 
-    /* 移动端二级分栏：单列纵向 */
-    .nav-mega { padding: 10px 0 24px; }
+    /* 一级项变纵向：其内的二级菜单在项正下方展开 */
+    .nav-item.dropdown {
+        flex-direction: column;
+        align-items: stretch;
+        height: auto;
+    }
 
+    /* 二级菜单挂在一级项内：占满宽度，显示在按钮下方 */
+    .nav-item.dropdown > .mega-panel {
+        width: 100%;
+        padding: 4px 0 16px;
+    }
+
+    /* 移动端面板已挂入各一级项，原 nav-mega 容器不再使用 */
+    .nav-mega { display: none; }
+
+    /* 移动端二级分栏：单列纵向 */
     .mega-columns { grid-template-columns: 1fr; gap: 22px; }
 
     .menu-group { padding: 0; }
