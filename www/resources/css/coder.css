@@ -158,7 +158,14 @@
 /* ---------- 移动端 ---------- */
 @media (max-width: 620px) {
     .coder-main { padding: 36px 16px 56px; }
-    .coder-tabs { width: 100%; overflow-x: auto; }
+    /* 选项卡：横向可滚动但隐藏滚动条（同 nav 菜单，保留隐式横向滚动） */
+    .coder-tabs {
+        width: 100%;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    .coder-tabs::-webkit-scrollbar { display: none; width: 0; height: 0; }
     .coder-tab { flex-shrink: 0; }
     .coder-output-head { flex-wrap: wrap; }
 }
