@@ -4,7 +4,9 @@
  * 职责：
  *   1. 选项卡控制输出类型（文本 / base64 / UTF-8 / Unicode / URL）
  *   2. 智能识别输入内容的编码类型（自动判定），并转换为所选输出类型
- *   3. 输出框一键复制
+ *   3. 「手动」选项卡：输入 / 输出类型由两个选择列表分别指定，
+ *      解决自动识别与用户意图不一致（内容与另一类型重合）的问题
+ *   4. 输出框一键复制
  */
 (function () {
     'use strict';
@@ -17,6 +19,15 @@
     var copyLabel  = document.getElementById('cd-copy-label');
     var tabs       = Array.prototype.slice.call(document.querySelectorAll('.coder-tab'));
     var currentType = 'text';
+
+    /* ---------- 手动模式状态 ---------- */
+    var isManual      = false;              // 是否为「手动」选项卡
+    var manualInType  = 'text';             // 手动指定的输入类型
+    var manualOutType = 'text';             // 手动指定的输出类型
+    var inTrigger  = document.getElementById('cd-in-type-trigger');
+    var inTypeLbl  = document.getElementById('cd-in-type-label');
+    var outTrigger = document.getElementById('cd-out-type-trigger');
+    var outTypeLbl = document.getElementById('cd-out-type-label');
 
     /* ---------- 类型标签 ---------- */
     var TYPE_LABEL = {
@@ -176,18 +187,27 @@
     /* ---------- 主流程 ---------- */
     function run() {
         var raw = input.value;
-        var inType = detectType(raw);
+        var inType, outType;
+        if (isManual) {
+            // 手动模式：输入 / 输出类型由两个选择列表分别指定
+            inType  = manualInType;
+            outType = manualOutType;
+        } else {
+            // 自动模式：自动识别输入类型，输出用当前选项卡
+            inType  = detectType(raw);
+            outType = currentType;
+        }
         var text;
         try {
             text = decodeInput(inType, raw);
         } catch (e) {
             text = raw;   // 解码失败按原样处理
         }
-        var out = encodeTarget(currentType, text);
+        var out = encodeTarget(outType, text);
 
         output.value = out;
         inTypeEl.textContent = TYPE_LABEL[inType];
-        outTypeEl.textContent = TYPE_LABEL[currentType];
+        outTypeEl.textContent = TYPE_LABEL[outType];
     }
 
     /* ---------- 选项卡切换 ---------- */
@@ -196,8 +216,94 @@
             tabs.forEach(function (t) { t.classList.remove('active'); });
             tab.classList.add('active');
             currentType = tab.dataset.type;
+            isManual = (currentType === 'manual');
+            syncManualUI();
             run();
         });
+    });
+
+    /* ---------- 手动模式：类型选择列表（点击展开） ---------- */
+    var MANUAL_TYPES = ['text', 'base64', 'utf8', 'unicode', 'url'];
+    var typeMenu = null;   // 当前打开的类型选择列表
+
+    /** 切换手动模式 UI：是否显示输入 / 输出两个类型选择按钮 */
+    function syncManualUI() {
+        if (inTrigger) inTrigger.hidden = !isManual;
+        if (outTrigger) outTrigger.hidden = !isManual;
+        if (!isManual) closeTypeMenu();
+    }
+
+    /** 在触发按钮下方展开类型选择列表 */
+    function openTypeMenu(trigger, side) {
+        closeTypeMenu();
+        var menu = document.createElement('div');
+        menu.className = 'coder-type-menu';
+        menu.setAttribute('role', 'listbox');
+
+        var current = side === 'in' ? manualInType : manualOutType;
+        MANUAL_TYPES.forEach(function (type) {
+            var opt = document.createElement('button');
+            opt.type = 'button';
+            opt.className = 'coder-type-option' + (type === current ? ' active' : '');
+            opt.dataset.type = type;
+            opt.textContent = TYPE_LABEL[type];
+            opt.addEventListener('click', function () {
+                if (side === 'in') {
+                    manualInType = type;
+                    inTypeLbl.textContent = TYPE_LABEL[type];
+                } else {
+                    manualOutType = type;
+                    outTypeLbl.textContent = TYPE_LABEL[type];
+                }
+                closeTypeMenu();
+                run();
+            });
+            menu.appendChild(opt);
+        });
+
+        document.body.appendChild(menu);
+        typeMenu = menu;
+        typeMenu.__side = side;
+        trigger.setAttribute('aria-expanded', 'true');
+
+        // 定位到触发按钮下方（限制在视口内，避免窄屏右侧溢出）
+        var r = trigger.getBoundingClientRect();
+        var left = Math.min(r.left, window.innerWidth - menu.offsetWidth - 8);
+        menu.style.top  = r.bottom + 6 + 'px';
+        menu.style.left = Math.max(8, left) + 'px';
+    }
+
+    /** 关闭当前打开的类型选择列表 */
+    function closeTypeMenu() {
+        if (typeMenu) { typeMenu.remove(); typeMenu = null; }
+        if (inTrigger) inTrigger.setAttribute('aria-expanded', 'false');
+        if (outTrigger) outTrigger.setAttribute('aria-expanded', 'false');
+    }
+
+    function toggleTypeMenu(trigger, side) {
+        if (typeMenu && typeMenu.__side === side) closeTypeMenu();
+        else openTypeMenu(trigger, side);
+    }
+
+    if (inTrigger) {
+        inTrigger.addEventListener('click', function (e) {
+            e.stopPropagation();
+            toggleTypeMenu(inTrigger, 'in');
+        });
+    }
+    if (outTrigger) {
+        outTrigger.addEventListener('click', function (e) {
+            e.stopPropagation();
+            toggleTypeMenu(outTrigger, 'out');
+        });
+    }
+
+    // 点击其他区域 / Esc 关闭类型列表
+    document.addEventListener('click', function (e) {
+        if (typeMenu && !typeMenu.contains(e.target)) closeTypeMenu();
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeTypeMenu();
     });
 
     /* ---------- 输入实时转换 ---------- */

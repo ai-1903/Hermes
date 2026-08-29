@@ -29,11 +29,20 @@ require __DIR__ . '/view/header.php';
             <button type="button" class="coder-tab" data-type="utf8" role="tab">UTF-8</button>
             <button type="button" class="coder-tab" data-type="unicode" role="tab">Unicode</button>
             <button type="button" class="coder-tab" data-type="url" role="tab">URL</button>
+            <button type="button" class="coder-tab" data-type="manual" role="tab">手动</button>
         </div>
 
-        <!-- 输入框 -->
-        <textarea id="cd-input" class="coder-input" spellcheck="false"
-                  placeholder="输入要转换的内容… 自动识别其编码类型并转换为所选输出格式"></textarea>
+        <!-- 输入框（手动模式：顶部显示输入类型选择） -->
+        <div class="coder-field">
+            <button type="button" class="coder-type-trigger" id="cd-in-type-trigger"
+                    data-side="in" aria-haspopup="listbox" aria-expanded="false" hidden>
+                <iconify-icon icon="fluent:tag-20-regular"></iconify-icon>
+                <span id="cd-in-type-label">文本</span>
+                <span class="caret" aria-hidden="true"></span>
+            </button>
+            <textarea id="cd-input" class="coder-input" spellcheck="false"
+                      placeholder="输入要转换的内容… 自动识别其编码类型并转换为所选输出格式"></textarea>
+        </div>
 
         <!-- 输出框：类型标注 + 复制按钮 -->
         <div class="coder-output-wrap">
@@ -44,6 +53,15 @@ require __DIR__ . '/view/header.php';
                     <span class="arrow">→</span>
                     输出 <b id="cd-out-type" class="type-tag type-tag-out">文本</b>
                 </span>
+
+                <!-- 手动模式：输出类型选择列表（点击展开） -->
+                <button type="button" class="coder-type-trigger" id="cd-out-type-trigger"
+                        data-side="out" aria-haspopup="listbox" aria-expanded="false" hidden>
+                    <iconify-icon icon="fluent:tag-20-regular"></iconify-icon>
+                    <span id="cd-out-type-label">文本</span>
+                    <span class="caret" aria-hidden="true"></span>
+                </button>
+
                 <button id="cd-copy" class="coder-copy" type="button" title="一键复制">
                     <iconify-icon icon="fluent:copy-20-regular"></iconify-icon>
                     <span id="cd-copy-label">复制</span>
