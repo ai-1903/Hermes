@@ -1,0 +1,341 @@
+/* ==========================================================================
+   aegis-connection.css — 连接安全检测页样式（科幻风全屏 Hero）
+   类别：页面（aegis-connection.php 专属）
+   布局：初始左右分栏（左标题 / 右粒子团）；检测时聚向屏幕中心
+   ========================================================================== */
+
+.aegis-conn-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 40px 24px 72px;
+}
+
+/* ---------- 英雄区：左右分栏（桌面） ---------- */
+.conn-hero {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 40px;
+    min-height: 460px;
+    max-width: 1100px;
+    width: 100%;
+    margin: 0 auto;
+    transition: grid-template-columns 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ---------- 左侧：标题 + 控件 ---------- */
+.conn-intro {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+    transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.conn-title {
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: #eaf6ff;
+    text-shadow: 0 0 30px rgba(34, 211, 238, 0.35);
+}
+
+.conn-sub {
+    font-size: 1.02rem;
+    color: var(--text-secondary);
+    max-width: 460px;
+    line-height: 1.7;
+}
+
+/* 控件区：所在地 + 按钮 */
+.conn-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.conn-country-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.conn-country-label iconify-icon { color: var(--accent); font-size: 1rem; }
+
+.conn-country {
+    width: 190px;
+    padding: 9px 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--text);
+    font-size: 0.9rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.conn-country:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.12);
+}
+
+.conn-country::placeholder { color: var(--text-dim); }
+
+.conn-check-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 26px;
+    background: linear-gradient(135deg, rgba(34, 211, 238, 0.22), rgba(56, 189, 248, 0.22));
+    border: 1px solid rgba(34, 211, 238, 0.4);
+    border-radius: var(--radius-pill);
+    color: #a5f3fc;
+    font-size: 0.95rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    box-shadow: 0 0 22px rgba(34, 211, 238, 0.22);
+    transition: background 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+
+.conn-check-btn:hover {
+    background: linear-gradient(135deg, rgba(34, 211, 238, 0.32), rgba(56, 189, 248, 0.32));
+    box-shadow: 0 0 30px rgba(34, 211, 238, 0.35);
+}
+
+.conn-check-btn:active { transform: scale(0.97); }
+
+.conn-check-btn:disabled { opacity: 0.6; cursor: default; }
+
+/* ---------- 右侧：粒子团舞台 ---------- */
+.conn-stage {
+    position: relative;
+    width: 100%;
+    height: 360px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.conn-particles {
+    width: 100%;
+    height: 100%;
+}
+
+/* ---------- 检测中：标题渐隐 + 粒子居中 ---------- */
+.conn-hero.is-detecting .conn-intro.is-fading {
+    opacity: 0;
+    transform: translateY(8px);
+    pointer-events: none;
+}
+
+.conn-hero.is-detecting .conn-stage.is-centered {
+    transform: translateX(0);
+    /* 粒子随 grid 两列收缩而自然居中 */
+}
+
+/* 「正在检测」标题：叠加在粒子团上方 */
+.conn-detecting {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 5;
+    pointer-events: none;
+    text-align: center;
+}
+
+.detecting-title {
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    color: #eaf6ff;
+    text-shadow: 0 0 26px rgba(34, 211, 238, 0.6);
+    animation: detecting-pulse 1.4s ease-in-out infinite;
+}
+
+.detecting-title::after {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 1.1em;
+    margin-left: 8px;
+    vertical-align: text-bottom;
+    background: var(--accent);
+    animation: detecting-caret 0.9s steps(2) infinite;
+}
+
+@keyframes detecting-pulse {
+    0%, 100% { opacity: 0.65; }
+    50% { opacity: 1; }
+}
+
+@keyframes detecting-caret {
+    0% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* ---------- 检测结果 ---------- */
+.conn-result {
+    max-width: 760px;
+    width: 100%;
+    margin: 48px auto 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+    animation: result-in 0.5s ease;
+}
+
+@keyframes result-in {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.result-score-wrap {
+    text-align: center;
+}
+
+.result-score {
+    font-size: clamp(3.4rem, 10vw, 5.4rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    background: linear-gradient(135deg, #34d399, #22d3ee);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 40px rgba(34, 211, 238, 0.3);
+}
+
+.result-score-label {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    letter-spacing: 0.06em;
+}
+
+.result-list {
+    list-style: none;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.result-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+.result-item.pass { border-left: 3px solid var(--green); }
+.result-item.fail { border-left: 3px solid var(--red); }
+
+.result-icon {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    font-size: 1.5rem;
+}
+
+.result-item.pass .result-icon { color: var(--green); }
+.result-item.fail .result-icon { color: var(--red); }
+
+.result-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.result-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 3px;
+}
+
+.result-label iconify-icon { color: var(--accent); font-size: 1rem; }
+
+.result-detail {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.result-state {
+    flex-shrink: 0;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 3px 12px;
+    border-radius: var(--radius-pill);
+}
+
+.result-item.pass .result-state {
+    color: var(--green);
+    background: rgba(52, 211, 153, 0.12);
+}
+
+.result-item.fail .result-state {
+    color: var(--red);
+    background: rgba(248, 113, 113, 0.12);
+}
+
+.conn-again-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 24px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    color: var(--text-secondary);
+    font-size: 0.88rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+}
+
+.conn-again-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.conn-again-btn iconify-icon { font-size: 1rem; }
+
+/* ---------- 移动端：纵向布局，粒子居上/居中 ---------- */
+@media (max-width: 820px) {
+    .aegis-conn-main { padding: 32px 18px 56px; }
+    .conn-hero {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        min-height: 0;
+    }
+    .conn-stage { height: 260px; order: -1; }
+    .conn-title { font-size: clamp(1.9rem, 8vw, 2.6rem); }
+    .conn-controls { flex-direction: column; align-items: stretch; }
+    .conn-country { width: 100%; }
+    .conn-check-btn { justify-content: center; }
+    .conn-intro { align-items: stretch; text-align: center; }
+    .conn-sub { margin: 0 auto; }
+}
