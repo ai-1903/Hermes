@@ -149,15 +149,46 @@
         });
     }
 
-    /** 内网环境分类：iPhone 热点 / 大内网 / 其它 */
-    function classifyLocal(localIps) {
-        var big = /^(192\.168\.|10\.)/;
+    /** 内网环境分类：基于多次测量比对内网 IP 是否大幅变化
+     *  - 多次记录中内网 IP 大幅变化（如 10.0.0.3 → 10.24.155.24、
+     *    192.168.1.15 → 192.168.15.4，不像家庭路由器稳定特征）→ 公司/校园网特征
+     *  - 单次 / 多次内网 IP 稳定 → 家庭 / 小型网络
+     *  - iPhone 热点（172.20.10.x）→ 安全
+     * @param {string[]} localIps 本次内网 IP
+     * @param {string[][]} historyLocal 历史各次内网 IP（每项为一次测量的 IP 数组） */
+    function classifyLocal(localIps, historyLocal) {
         var iphone = /^172\.20\.10\./;
-        var hotspot = localIps.filter(function (ip) { return iphone.test(ip); });
+        // iPhone 热点优先判定安全
+        var hotspot = (localIps || []).filter(function (ip) { return iphone.test(ip); });
         if (hotspot.length) return { kind: 'hotspot', detail: 'iPhone 热点内网（172.20.10.x，判断为安全）' };
-        var bigNet = localIps.filter(function (ip) { return big.test(ip); });
-        if (bigNet.length) return { kind: 'big', detail: '大内网（' + bigNet.join('、') + '），可能存在局域网监控' };
-        if (localIps.length) return { kind: 'other', detail: '内网 IP：' + localIps.join('、') };
+
+        // 汇总所有历史内网 IP（含本次）
+        var all = (localIps || []).slice();
+        (historyLocal || []).forEach(function (arr) {
+            (arr || []).forEach(function (ip) { if (all.indexOf(ip) === -1) all.push(ip); });
+        });
+        var real = all.filter(function (ip) { return /^(192\.168\.|10\.|172\.)/.test(ip); });
+
+        // 多次测量且内网 IP 大幅变化 → 公司 / 校园网特征
+        if (all.length >= 2) {
+            // 计算各 IP 的「网段变化」：主网段（前三段）是否频繁切换
+            var subnets = {};
+            all.forEach(function (ip) {
+                var s = ip.split('.').slice(0, 3).join('.');
+                subnets[s] = true;
+            });
+            var subnetCount = Object.keys(subnets).length;
+            if (subnetCount >= 2) {
+                return {
+                    kind: 'unstable',
+                    detail: '多次测量内网 IP 变化较大（' + all.join('、') +
+                        '），不像家庭路由器稳定特征，存在公司 / 校园网特征，可能有上网监控',
+                };
+            }
+        }
+
+        if (real.length) return { kind: 'stable', detail: '内网 IP 稳定（' + real.join('、') + '），符合家庭 / 小型网络特征' };
+        if (all.length) return { kind: 'other', detail: '内网 IP：' + all.join('、') };
         return { kind: 'unknown', detail: '未能获取内网 IP（浏览器限制），建议多次测量' };
     }
 
@@ -217,7 +248,7 @@
     var WEIGHTS = [
         { key: 'mitm',   weight: 50, label: '中间人劫持检测（TLS 指纹一致）', icon: 'fluent:shield-lock-20-regular' },
         { key: 'env',    weight: 30, label: '非公司 / 校园网络环境', icon: 'fluent:building-20-regular' },
-        { key: 'local',  weight: 20, label: '内网环境安全（无大内网监控）', icon: 'fluent:home-20-regular' },
+        { key: 'local',  weight: 20, label: '内网环境稳定（多次测量 IP 无明显大幅变化）', icon: 'fluent:home-20-regular' },
     ];
 
     function computeScore(results) {
@@ -470,8 +501,16 @@
             return fetchTlsCheck('www.baidu.com').then(function (tls) {
                 // 网络环境（公司 / 校园网）
                 var envPass = !isCompanyNet(info.org);
-                // 内网环境
-                var local = classifyLocal(localIps);
+                // 内网环境：需多次比对内网 IP 变化（收集当前 Tab 历史各次内网 IP）
+                var histLocal = [];
+                var tabs = loadTabs();
+                var curTab = tabs.filter(function (t) { return t.id === activeTabId; })[0];
+                if (curTab) {
+                    (curTab.results || []).forEach(function (r) {
+                        if (r.localIps && r.localIps.length) histLocal.push(r.localIps);
+                    });
+                }
+                var local = classifyLocal(localIps, histLocal);
 
                 var results = {
                     mitm: {
@@ -489,7 +528,7 @@
                             : '检测到公司 / 校园网环境（' + (info.org || '未知') + '），可能存在上网监控',
                     },
                     local: {
-                        pass: local.kind === 'hotspot' || local.kind === 'unknown' || local.kind === 'other',
+                        pass: local.kind !== 'unstable',
                         detail: local.detail,
                     },
                 };
