@@ -38,6 +38,9 @@
 
     /* ================= 内部状态：RGBA 基准 ================= */
     var state = { r: 34, g: 211, b: 238, a: 1 };   // 默认青色
+    // OKLCH 显示覆盖：当用户输入超出 sRGB（P3）的 OKLCH 值时，
+    // 保留其原值显示（不退回钳制值）；其它来源更新时清空
+    var oklchOverride = null;   // { l, c, h }
 
     /* ================= 颜色转换 ================= */
 
@@ -159,8 +162,9 @@
         if (state.a < 0.999) hex += toHex(Math.round(state.a * 255));
         hexInput.value = hex;
 
-        // OKLCH（H 用 2 位小数，保证纯色往返精度）
-        var okl = rgbToOklch(state.r, state.g, state.b);
+        // OKLCH：若存在用户输入的 P3 原值（oklchOverride），显示原值；
+        // 否则从 state 反算（H 用 2 位小数，保证纯色往返精度）
+        var okl = oklchOverride || rgbToOklch(state.r, state.g, state.b);
         oklchInputs[0].value = fmt(okl.l, 4);
         oklchInputs[1].value = fmt(okl.c, 4);
         oklchInputs[2].value = fmt(okl.h, 2);
@@ -319,6 +323,7 @@
         var a = clamp(parseFloat(rgbaInputs[3].value), 0, 1);
         if (isNaN(a)) a = 1;
         state = { r: r, g: g, b: b, a: a };
+        clearOklchOverride();   // RGBA 是 sRGB 色 → 清除 P3 原值覆盖
     }
 
     function parseHex() {
@@ -335,6 +340,7 @@
             state.b = parseInt(v.substr(4, 2), 16);
             state.a = parseInt(v.substr(6, 2), 16) / 255;
         }
+        clearOklchOverride();   // HEX 是 sRGB 色 → 清除 P3 原值覆盖
         // 无效则忽略（保持原值）
     }
 
@@ -346,11 +352,13 @@
         if (isNaN(l) || isNaN(c) || isNaN(h)) return;
         if (isNaN(a)) a = 1;
         a = clamp(a, 0, 1);
-        // 色域判断：OKLCH 超出 sRGB（P3）→ 底部横幅提示
+        // 色域判断：OKLCH 超出 sRGB（P3）→ 底部横幅提示 + 保留原值显示
         if (oklchOutOfSrgb(l, c, h)) {
             showBanner('p3');
+            oklchOverride = { l: l, c: c, h: h };   // 保持用户输入的原值（不退回）
         } else {
             hideBanner('p3');
+            oklchOverride = null;
         }
         var lin = oklchToLinearRgb(l, c, h);
         state.r = Math.round(clamp(linearToSrgbRaw(lin[0]) * 255, 0, 255));
@@ -375,10 +383,16 @@
         }
         var rgb = cmykToRgb(c, m, y, k);
         state.r = rgb.r; state.g = rgb.g; state.b = rgb.b;
+        clearOklchOverride();   // CMYK 转回 sRGB 色 → 清除 P3 原值覆盖
     }
 
     /* ================= 色域提示横幅（主内容下方列表，动态显隐无关闭按钮） =================
        超出显示 / 调回自动隐藏：showBanner / hideBanner 由各解析函数在每次更新时调用。 */
+    /** 清除 OKLCH P3 原值覆盖（颜色来自其它 sRGB 来源时调用） */
+    function clearOklchOverride() {
+        oklchOverride = null;
+        hideBanner('p3');   // 已回到 sRGB 色 → 隐藏 P3 横幅
+    }
     function showBanner(kind) {
         var b = kind === 'cmyk' ? bannerCmyk : bannerP3;
         if (b) b.hidden = false;
@@ -441,10 +455,12 @@
         var v = rgbToHsv(state.r, state.g, state.b).v;
         var rgb = hsvToRgb(hue, sat, v);
         state.r = rgb[0]; state.g = rgb[1]; state.b = rgb[2];
+        clearOklchOverride();   // 调色盘产生 sRGB 色 → 清除 P3 原值覆盖
         renderAll();
     }
     function applyAlpha(a) {
         state.a = a;
+        // 透明度变化不改变色相，不清除 P3 override（保持显示）
         renderAll();
     }
     function applyValue(v) {
@@ -452,6 +468,7 @@
         var hsv = rgbToHsv(state.r, state.g, state.b);
         var rgb = hsvToRgb(hsv.h, hsv.s, v);
         state.r = rgb[0]; state.g = rgb[1]; state.b = rgb[2];
+        clearOklchOverride();   // 明度条产生 sRGB 色 → 清除 P3 原值覆盖
         renderAll();
     }
 

@@ -340,7 +340,7 @@
     .ir-label { width: 44px; }
     .ir-banner-list { max-width: 100%; }
 
-    /* 复制按钮：换行到输入框组下方，宽度与输入框组一致、左缘对齐输入框组
+    /* 复制按钮：换行到输入框组下方独占一行，宽度与输入框组一致、左缘对齐输入框组
        （label + gap 后 → margin-left = 44 + 10；宽 224 = 输入框组宽） */
     .ir-row {
         flex-wrap: wrap;
@@ -348,8 +348,11 @@
     }
     .ir-copy {
         order: 5;
+        flex: 0 0 224px;                 /* 固定宽，独占换行，不侵入其它元素 */
         width: 224px;                    /* 与输入框组同宽 */
         margin-left: calc(44px + 10px);  /* label + gap，对齐输入框组左缘 */
+        position: static;                /* 重置桌面 relative，避免定位残留 */
+        height: auto;
     }
 
     /* 移动端不需要复制图标：彻底隐藏按钮本体（menu 已是兄弟节点） */
@@ -357,17 +360,21 @@
 
     /* 胶囊菜单：移动端转为静态流内、常显（无需悬停），两个胶囊均分占满 */
     .ir-copy-menu {
-        position: static;
+        position: static;                /* 强制静态，杜绝绝对定位侵入 */
+        left: auto;
+        top: auto;
         opacity: 1;
         visibility: visible;
         pointer-events: auto;
+        display: flex;
         width: 100%;
         height: 32px;
     }
 
     /* 两个胶囊均分占满，居中文本 */
     .ir-copy-opt {
-        flex: 1;
+        flex: 1 1 0;
+        min-width: 0;
         height: 32px;
         padding: 0 4px;
         justify-content: center;
