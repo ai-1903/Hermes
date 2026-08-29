@@ -207,6 +207,13 @@
         { "keys": ["mtn"], "name": "MTN" },
         { "keys": ["safaricom"], "name": "Safaricom" }
       ]
+    },
+    {
+      "name": "已知 VPN / 代理",
+      "region": "全球 / VPN",
+      "entries": [
+        { "keys": ["ikuuu", "IKUUU NETWORK", "IKUUU-AS-AP"], "name": "IKUUU（已知 VPN）" }
+      ]
     }
   ]
 }

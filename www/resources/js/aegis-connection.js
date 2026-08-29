@@ -6,13 +6,14 @@
  *   1. 右侧矢量自旋粒子团（canvas）：若干粒子沿轨道自旋，随动画微移
  *   2. 点击「检查安全」：标题向中心渐隐，粒子团移至屏幕中心，
  *      叠加「正在检测」标题；期间并行执行 4 项检测
- *   3. 检测项：
- *      a. IP 归属地与所选国家是否一致（ipinfo.io）
- *      b. 网络环境：Tor / VPN 运营商判定
- *      c. DNS 泄漏：Cloudflare 与阿里 DoH 解析同一域名，比对归属地是否一致
- *      d. DoH 支持：能否通过加密 DNS（DoH）完成解析
- *   4. 加权打分（满分 100）+ 逐项通过（勾）/ 失败（叉）列表
- * 约束：全部走公共 API，不请求自有 PHP；不做本地缓存（公共 API 不限频）
+ *   3. 检测项（均为「更安全」得分项，指上网匿名性 / 自由性 / 抗监控）：
+ *      a. 是否启用代理：IP 归属地与所选所在地不一致 → 通过（匿名性更高）
+ *      b. 网络环境是否为 Tor / VPN：是 → 通过（更难被公司网 / 校园网监控）
+ *      c. DNS 无泄漏：Cloudflare / 阿里 DoH + 用户实际 DNS ISP 三方解析一致
+ *      d. 支持加密 DNS（DoH）：能否通过 Cloudflare / 阿里 DoH 完成解析
+ *   4. 加权打分（满分 100，四项全过）+ 逐项通过（勾）/ 失败（叉）列表
+ * 约束：公共 API 直连；自有 PHP（dns-lookup.php）带服务端缓存 6h +
+ *       前端 localStorage 节流（≥30 分钟、IP 变化才重新请求）
  */
 (function () {
     'use strict';
@@ -138,9 +139,9 @@
     }
 
     /**
-     * 检测 1：IP 归属地与所选国家是否一致
-     * 通过（1）：真实 IP 的 country 码 == 用户所选国家码
-     * 失败（0）：不一致
+     * 检测 1：IP 归属地与所选国家是否一致（是否启用代理）
+     * 通过（1）：IP 归属地与所选国家不一致（启用了代理 → 匿名性更高，更安全）
+     * 失败（0）：一致（未启用代理，可能被公司/校园网监控）
      * 附带获取 IP / org（供网络环境判定复用）
      */
     function checkCountry() {
@@ -149,35 +150,65 @@
             .then(function (d) {
                 var code = (d.country || '').toUpperCase();
                 var expect = COUNTRY_CODE[norm(countryInput.value)];
-                var pass = expect ? code === expect : false;
+                var isProxy = expect ? code !== expect : true;   // 所选地区与 IP 归属不一致 → 启用了代理
                 return {
-                    pass: pass,
+                    pass: isProxy,
                     ip: d.ip,
                     org: d.org || '',
                     country: d.country || '',
                     detail: 'IP ' + (d.ip || '?') + ' → ' + (d.country || '未知')
-                            + '（期望 ' + (countryInput.value || '未选择') + '）',
+                            + '（所在地 ' + (countryInput.value || '未选择') + '）'
+                            + (isProxy ? '，启用代理' : '，未启用代理'),
                 };
             });
     }
 
-    /** 网络环境判定：Tor / VPN 运营商关键字启发式 */
+    /** 网络环境判定：Tor / VPN / 代理运营商关键字启发式 */
     var VPN_RE = /\b(vpn|virtual\s*private\s*network|proxy|tor|onion|relay|exit\s*node|tunnel|anonymi[sz]e)\b/i;
+    // 常见数据中心 / 代理托管（代理节点常托管于云商）
+    var DC_RE = /Amazon|AWS|Microsoft|Azure|Google|GCP|Oracle|DigitalOcean|Linode|Vultr|Hetzner|OVH|M247|TorExit|Datacamp|FlokiNET/i;
+    var vpnDict = null;   // isp-dict.json 中「已知 VPN / 代理」类别关键词
 
-    /** 检测 2：网络运营商 / 环境是否为 Tor 或 VPN
-     *  通过（1）：普通家庭 / 移动宽带（非 Tor/VPN）
-     *  失败（0）：检测到 Tor / VPN / 代理 */
+    /** 加载运营商字典（仅取「已知 VPN / 代理」类别关键词），失败返回空 */
+    function loadVpnDict() {
+        if (vpnDict) return Promise.resolve(vpnDict);
+        return fetch('data/json/isp-dict.json', { cache: 'no-store' })
+            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+            .then(function (d) {
+                var keys = [];
+                (d.categories || []).forEach(function (c) {
+                    if (/vpn|代理/i.test(c.name || '')) {
+                        (c.entries || []).forEach(function (e) {
+                            (e.keys || []).forEach(function (k) {
+                                if (k) keys.push(String(k).toLowerCase());
+                            });
+                        });
+                    }
+                });
+                vpnDict = keys;
+                return keys;
+            })
+            .catch(function () { vpnDict = []; return []; });
+    }
+
+    /** 命中字典关键词（关键词按长度降序，最具体者优先） */
+    function matchDict(org, keys) {
+        var n = String(org || '').toLowerCase();
+        if (!n || !keys || !keys.length) return false;
+        return keys.some(function (k) { return k && n.indexOf(k) !== -1; });
+    }
+
+    /** 检测 2：网络运营商 / 环境是否为 Tor / VPN
+     *  通过（1）：检测到 Tor / VPN / 代理（匿名性更高，更安全）
+     *  失败（0）：普通家庭 / 移动宽带（非 Tor/VPN） */
     function checkNetwork(info) {
         var org = info.org || '';
-        var isSuspicious = VPN_RE.test(org);
-        // 常见数据中心/代理托管也视为可疑（运营商标识含云商/托管）
-        var DC_RE = /Amazon|AWS|Microsoft|Azure|Google|GCP|Oracle|DigitalOcean|Linode|Vultr|Hetzner|OVH|M247|TorExit/i;
-        isSuspicious = isSuspicious || DC_RE.test(org);
+        var isVpn = VPN_RE.test(org) || DC_RE.test(org) || matchDict(org, vpnDict || []);
         return {
-            pass: !isSuspicious,
-            detail: isSuspicious
-                ? '检测到疑似代理 / Tor / VPN 网络环境（' + (org || '未知') + '）'
-                : '网络环境为普通家庭 / 移动宽带（' + (org || '未知') + '）',
+            pass: isVpn,
+            detail: isVpn
+                ? '检测到 Tor / VPN / 代理网络环境（' + (org || '未知') + '）'
+                : '网络环境为普通家庭 / 移动宽带（' + (org || '未知') + '），未走 Tor/VPN',
         };
     }
 
@@ -192,38 +223,45 @@
     }
 
     /**
-     * 检测 3：DNS 泄漏——Cloudflare（国际）与阿里（国内）DoH 解析同一域名，
-     *   比对 IP 归属地是否一致。一致 = 无泄漏（1）；差异大 = 泄漏 / 被劫持（0）。
-     *   若任一端点失败，退回「单端点可用即算通过」（DoH 本身可用说明非完全泄漏）。
+     * 检测 3：DNS 泄漏——比对三方解析是否一致：
+     *   - Cloudflare DoH（国际）
+     *   - 阿里 DoH（国内）
+     *   - PHP 中转：服务器实际解析该域名得到的 DNS（即「用户访问过来时解析的 DNS ISP」）
+     * 三方解析结果归属地一致 = 无泄漏（1）；不一致 = 泄漏 / 被劫持（0）。
      */
     function checkDnsLeak() {
         var domain = 'example.com';
         var cf = dohResolve('https://cloudflare-dns.com/dns-query?name=' + domain + '&type=A');
         var ali = dohResolve('https://dns.alidns.com/resolve?name=' + domain + '&type=A');
+        var server = fetchServerDns(domain);   // 自有服务端（带 localStorage 节流）
 
-        return Promise.all([cf, ali]).then(function (res) {
-            var cfIps = res[0] || [], aliIps = res[1] || [];
-            // 归属地比对：取各家首个 IP 查 ipwho.is，比较 country
+        return Promise.all([cf, ali, server]).then(function (res) {
+            var cfIps = res[0] || [], aliIps = res[1] || [], srvIps = res[2] || [];
+            // 归属地比对：取各来源首个 IP 查 ipwho.is，比较 country
             var tasks = [];
             if (cfIps.length) tasks.push(ipCountry(cfIps[0]).then(function (c) { return { src: 'Cloudflare', ip: cfIps[0], country: c }; }));
             if (aliIps.length) tasks.push(ipCountry(aliIps[0]).then(function (c) { return { src: '阿里', ip: aliIps[0], country: c }; }));
+            if (srvIps.length) tasks.push(ipCountry(srvIps[0]).then(function (c) { return { src: '用户实际 DNS', ip: srvIps[0], country: c }; }));
+
             return Promise.all(tasks).then(function (infos) {
-                if (infos.length < 2) {
-                    // 仅一个可用 → 视为通过（能完成 DoH 解析即基本无泄漏迹象）
+                // 过滤掉归属地无法判定的来源（如本地 fake-ip 查不到归属），避免误判
+                var known = infos.filter(function (i) { return i.country; });
+                if (known.length < 2) {
                     return {
-                        pass: infos.length === 1,
-                        detail: infos.length === 1
-                            ? 'DNS 解析正常（' + infos[0].src + ' → ' + infos[0].ip + ' / ' + infos[0].country + '）'
+                        pass: known.length === 1,
+                        detail: known.length === 1
+                            ? 'DNS 解析正常（' + known[0].src + ' → ' + known[0].ip + ' / ' + known[0].country + '）'
                             : 'DNS 解析服务暂不可用，无法判断',
                     };
                 }
-                var pass = infos[0].country === infos[1].country;
+                // 全部来源归属地一致 → 无泄漏
+                var first = known[0].country;
+                var pass = known.every(function (i) { return i.country === first; });
                 return {
                     pass: pass,
                     detail: pass
-                        ? '公共 DNS 解析一致（' + infos[0].src + ' 与 ' + infos[1].src + ' 均 → ' + infos[0].country + '）'
-                        : '公共 DNS 解析归属不一致（' + infos[0].src + ' → ' + infos[0].country
-                            + '，' + infos[1].src + ' → ' + infos[1].country + '），疑似 DNS 泄漏',
+                        ? 'DNS 解析一致（' + known.map(function (i) { return i.src + '→' + i.country; }).join('、') + '），无泄漏'
+                        : 'DNS 解析归属不一致（' + known.map(function (i) { return i.src + '→' + i.country; }).join('、') + '），疑似 DNS 泄漏',
                 };
             });
         }).catch(function () {
@@ -240,9 +278,9 @@
     }
 
     /**
-     * 检测 4：DoH 支持——能否通过加密 DNS 完成解析。
-     * 通过（1）：至少一个 DoH 端点成功返回解析
-     * 失败（0）：所有 DoH 均失败（网络屏蔽加密 DNS）
+     * 检测 4：支持加密 DNS（DoH）——能否通过 Cloudflare / 阿里 DoH 完成解析。
+     * 通过（1）：至少一个 DoH 端点成功返回解析（支持加密 DNS）
+     * 失败（0）：所有 DoH 均失败（加密 DNS 被阻断或不支持）
      */
     function checkDoh() {
         return Promise.all([
@@ -260,11 +298,12 @@
     }
 
     /* ================= 加权打分 =================
-       权重：IP 归属 40%、网络环境 25%、DNS 泄漏 20%、DoH 支持 15% */
+       权重：启用代理（IP 归属≠所在地）40%、Tor/VPN 网络环境 25%、
+             DNS 无泄漏 20%、支持加密 DNS 15% */
     var WEIGHTS = [
-        { key: 'country',  weight: 40, label: 'IP 归属地与所在地一致', icon: 'fluent:location-20-regular' },
-        { key: 'network',  weight: 25, label: '网络环境非 Tor / VPN',   icon: 'fluent:shield-20-regular' },
-        { key: 'dns',      weight: 20, label: 'DNS 无泄漏（公共 DNS 一致）', icon: 'fluent:globe-20-regular' },
+        { key: 'country',  weight: 40, label: '启用代理（IP 归属与所在地不一致）', icon: 'fluent:location-20-regular' },
+        { key: 'network',  weight: 25, label: '网络环境为 Tor / VPN',   icon: 'fluent:shield-20-regular' },
+        { key: 'dns',      weight: 20, label: 'DNS 无泄漏（多方解析一致）', icon: 'fluent:globe-20-regular' },
         { key: 'doh',      weight: 15, label: '支持加密 DNS（DoH）',    icon: 'fluent:lock-20-regular' },
     ];
 
@@ -300,14 +339,74 @@
         });
     }
 
+    /* ================= 自有服务端请求节流 =================
+       dns-lookup.php 是自有 PHP，需低频：
+       - localStorage 缓存结果（默认 6 小时）
+       - 仅当「客户端 IP 变化（新网络环境）」或「距上次请求 ≥30 分钟」才重新请求 */
+    var SERVER_DNS_CACHE_KEY = 'aegis_server_dns';
+    var SERVER_DNS_MIN_INTERVAL = 30 * 60 * 1000;   // 30 分钟
+    var SERVER_DNS_TTL = 6 * 3600 * 1000;           // 6 小时
+
+    /** 读取客户端当前出口 IP（复用 checkCountry 的 ipinfo 结果，避免重复请求） */
+    var lastClientIp = null;
+
+    /** 从 localStorage 读取缓存（过期 / 非法返回 null） */
+    function readServerDnsCache(host) {
+        try {
+            var raw = localStorage.getItem(SERVER_DNS_CACHE_KEY);
+            if (!raw) return null;
+            var c = JSON.parse(raw);
+            if (!c || c.host !== host) return null;
+            if (Date.now() - c.ts > SERVER_DNS_TTL) return null;   // 缓存过期
+            return c;
+        } catch (e) { return null; }
+    }
+
+    /** 写入缓存 */
+    function writeServerDnsCache(host, ips, clientIp) {
+        try {
+            localStorage.setItem(SERVER_DNS_CACHE_KEY, JSON.stringify({
+                host: host, ips: ips, ts: Date.now(), clientIp: clientIp,
+            }));
+        } catch (e) { /* 存储满 / 禁用时静默忽略 */ }
+    }
+
+    /**
+     * 节流获取自有服务端 DNS 解析：
+     *   - 缓存有效（<6h）且客户端 IP 未变 → 直接用缓存
+     *   - 否则若距上次 ≥30 分钟 → 重新请求
+     *   - 距上次 <30 分钟且 IP 未变 → 仍用缓存（避免高频）
+     */
+    function fetchServerDns(host) {
+        var cached = readServerDnsCache(host);
+        if (cached) {
+            var ipChanged = lastClientIp && cached.clientIp && cached.clientIp !== lastClientIp;
+            var intervalOk = Date.now() - cached.ts >= SERVER_DNS_MIN_INTERVAL;
+            if (!ipChanged && !intervalOk) {
+                return Promise.resolve(cached.ips);   // 命中缓存，不请求
+            }
+        }
+        return fetch('dns-lookup.php?host=' + encodeURIComponent(host))
+            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+            .then(function (d) {
+                var ips = d.ips || [];
+                writeServerDnsCache(host, ips, lastClientIp);
+                return ips;
+            })
+            .catch(function () { return []; });
+    }
+
     /* ================= 主流程 ================= */
     function run() {
         if (btn.disabled) return;
         enterDetecting();
         resultEl.hidden = true;
 
-        // 并行执行 4 项检测
-        checkCountry().then(function (country) {
+        // 加载 VPN 字典 → 获取 IP/归属（缓存客户端出口 IP 供节流比对）
+        loadVpnDict().then(function () {
+            return checkCountry();
+        }).then(function (country) {
+            lastClientIp = country.ip || null;
             var network = checkNetwork(country);
             return Promise.all([country, network, checkDnsLeak(), checkDoh()]);
         }).then(function (results) {

@@ -47,3 +47,6 @@ env/
 tmp/
 temp/
 *.tmp
+
+# 运行时缓存（dns-lookup.php 服务端解析缓存）
+www/data/cache/
