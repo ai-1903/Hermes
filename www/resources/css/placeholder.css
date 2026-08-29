@@ -1,0 +1,59 @@
+/* ==========================================================================
+   placeholder.css — 占位页面样式（功能建设中）
+   类别：页面（placeholder 视图专用，各工具页复用）
+   ========================================================================== */
+
+.placeholder-main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+}
+
+.placeholder-card {
+    text-align: center;
+    max-width: 460px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    padding: 44px 40px;
+    box-shadow: var(--shadow-card);
+}
+
+.placeholder-icon {
+    font-size: 3.2rem;
+    color: var(--accent);
+    filter: drop-shadow(0 0 12px rgba(34, 211, 238, 0.5));
+    margin-bottom: 16px;
+}
+
+.placeholder-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 10px;
+}
+
+.placeholder-desc {
+    font-size: 0.92rem;
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+}
+
+.placeholder-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    border-radius: var(--radius-pill);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--orange);
+    background: rgba(251, 191, 36, 0.12);
+    border: 1px solid rgba(251, 191, 36, 0.2);
+}
+
+.placeholder-badge iconify-icon { font-size: 1rem; }

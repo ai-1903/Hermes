@@ -46,6 +46,46 @@ return [
                 ],
             ],
         ],
+        [
+            'label'  => '实用工具',
+            'icon'   => 'fluent:toolbox-20-regular',
+            'groups' => [
+                [
+                    'title' => '雅努斯之门',
+                    'links' => [
+                        [
+                            'label' => 'Coder',
+                            'href'  => 'coder.php',
+                            'desc'  => '开发辅助工具',
+                            'icon'  => 'fluent:code-20-regular',
+                        ],
+                        [
+                            'label' => '普罗米修斯',
+                            'href'  => 'prometheus.php',
+                            'desc'  => '灵感与火种',
+                            'icon'  => 'fluent:flame-20-regular',
+                        ],
+                        [
+                            'label' => '伊里斯桥',
+                            'href'  => 'iris-bridge.php',
+                            'desc'  => '信息通道连接',
+                            'icon'  => 'fluent:bridge-20-regular',
+                        ],
+                    ],
+                ],
+                [
+                    'title' => 'Astraea',
+                    'links' => [
+                        [
+                            'label' => 'Astraea',
+                            'href'  => 'astraea.php',
+                            'desc'  => '天平与正义',
+                            'icon'  => 'fluent:scale-20-regular',
+                        ],
+                    ],
+                ],
+            ],
+        ],
     ],
     'copyright' => [
         'holder' => 'iCerya',
