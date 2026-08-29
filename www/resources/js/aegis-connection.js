@@ -3,15 +3,17 @@
  * 类别：页面
  * 依赖：lib/network.js（可选，未用则独立实现）
  * 职责：
- *   1. 右侧矢量自旋粒子团（canvas）：若干粒子沿轨道自旋，随动画微移
- *   2. 点击「检查安全」：标题向中心渐隐，粒子团移至屏幕中心，
- *      叠加「正在检测」标题；期间并行执行 4 项检测
+ *   1. 居中大标题 Hero + 国家选择 + 「检查安全」按钮
+ *   2. 点击「检查安全」：标题渐隐，显示居中「正在检测」标题；
+ *      期间并行执行 4 项检测
  *   3. 检测项（均为「更安全」得分项，指上网匿名性 / 自由性 / 抗监控）：
  *      a. 是否启用代理：IP 归属地与所选所在地不一致 → 通过（匿名性更高）
  *      b. 网络环境是否为 Tor / VPN：是 → 通过（更难被公司网 / 校园网监控）
  *      c. DNS 无泄漏：Cloudflare / 阿里 DoH + 用户实际 DNS ISP 三方解析一致
  *      d. 支持加密 DNS（DoH）：能否通过 Cloudflare / 阿里 DoH 完成解析
- *   4. 加权打分（满分 100，四项全过）+ 逐项通过（勾）/ 失败（叉）列表
+ *   4. 加权打分（满分 100，四项全过）+ 正常 / 黄 / 橙 / 红警示分级
+ *   5. 逐项通过（勾）/ 失败（叉）列表；上次检测结果缓存于 localStorage，
+ *      刷新后自动回显
  * 约束：公共 API 直连；自有 PHP（dns-lookup.php）带服务端缓存 6h +
  *       前端 localStorage 节流（≥30 分钟、IP 变化才重新请求）
  */
@@ -21,11 +23,10 @@
     /* ================= 元素引用 ================= */
     var hero     = document.getElementById('conn-hero');
     var intro    = document.getElementById('conn-intro');
-    var stage    = document.getElementById('conn-stage');
-    var canvas   = document.getElementById('conn-particles');
     var detecting= document.getElementById('conn-detecting');
     var resultEl = document.getElementById('conn-result');
     var scoreEl  = document.getElementById('result-score');
+    var badgeEl  = document.getElementById('result-badge');
     var listEl   = document.getElementById('result-list');
     var btn      = document.getElementById('conn-check-btn');
     var againBtn = document.getElementById('conn-again-btn');
@@ -44,81 +45,11 @@
         '阿富汗': 'AF', '阿拉伯': 'AE', '美国': 'US',
     };
 
-    /* ================= 粒子团（canvas） ================= */
-    var ctx = canvas.getContext('2d');
-    var particles = [];
-    var animId = null;
-    var particleCount = 46;         // 粒子数量
-    var spinAngle = 0;              // 整体自旋角
-    var radius = 96;                // 粒子分布半径
-
-    /** 初始化粒子（随机在球壳内分布） */
-    function initParticles() {
-        particles = [];
-        for (var i = 0; i < particleCount; i++) {
-            particles.push({
-                // 球坐标随机分布（theta 方位角 / phi 极角）
-                theta: Math.random() * Math.PI * 2,
-                phi: Math.acos(2 * Math.random() - 1),
-                r: radius * (0.55 + Math.random() * 0.45),
-                speed: 0.4 + Math.random() * 0.6,
-                size: 1.2 + Math.random() * 2.2,
-                color: Math.random() < 0.35 ? 'rgba(248,113,113,0.85)' : 'rgba(34,211,238,0.9)',
-            });
-        }
-    }
-
-    /** 尺寸自适应 */
-    function resize() {
-        var dpr = window.devicePixelRatio || 1;
-        var w = stage.clientWidth, h = stage.clientHeight;
-        canvas.width = w * dpr;
-        canvas.height = h * dpr;
-        canvas.style.width = w + 'px';
-        canvas.style.height = h + 'px';
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
-
-    /** 绘制一帧：粒子绕 Y 轴自旋 + 轻微呼吸 */
-    function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        var cx = canvas.width / 2 / (window.devicePixelRatio || 1);
-        var cy = canvas.height / 2 / (window.devicePixelRatio || 1);
-
-        for (var i = 0; i < particles.length; i++) {
-            var p = particles[i];
-            var spin = spinAngle * p.speed;
-            // 3D 球坐标 → 2D（绕 Y 轴旋转）
-            var x = p.r * Math.sin(p.phi) * Math.cos(p.theta + spin);
-            var y = p.r * Math.cos(p.phi);
-            var z = p.r * Math.sin(p.phi) * Math.sin(p.theta + spin);
-            var scale = (z + radius) / (2 * radius);   // 深度 → 大小/亮度
-            ctx.globalAlpha = 0.35 + 0.65 * scale;
-            ctx.fillStyle = p.color;
-            ctx.beginPath();
-            ctx.arc(cx + x, cy + y, p.size * (0.6 + 0.6 * scale), 0, Math.PI * 2);
-            ctx.fill();
-        }
-        ctx.globalAlpha = 1;
-        spinAngle += 0.012;
-        animId = requestAnimationFrame(draw);
-    }
-
-    /** 让粒子团「变红」——随风险度提升红色粒子占比 */
-    function setRisk(redRatio) {
-        for (var i = 0; i < particles.length; i++) {
-            particles[i].color = Math.random() < redRatio
-                ? 'rgba(248,113,113,0.9)'
-                : 'rgba(34,211,238,0.9)';
-        }
-    }
-
     /* ================= 布局状态切换 =================
-       点击检查：标题渐隐 → 粒子移向中心 → 显示「正在检测」 */
+       点击检查：标题渐隐 → 显示居中「正在检测」 */
     function enterDetecting() {
         hero.classList.add('is-detecting');
         intro.classList.add('is-fading');        // 标题渐隐
-        stage.classList.add('is-centered');      // 粒子团居中
         detecting.hidden = false;
         btn.disabled = true;
     }
@@ -126,7 +57,6 @@
     function leaveDetecting() {
         hero.classList.remove('is-detecting');
         intro.classList.remove('is-fading');
-        stage.classList.remove('is-centered');
         detecting.hidden = true;
         btn.disabled = false;
     }
@@ -315,10 +245,33 @@
         return score;
     }
 
-    /** 渲染结果列表：通过=打勾 / 失败=打叉 */
+    /* ================= 警示分级 =================
+       自高分到低分：正常（绿）→ 黄色 → 橙色 → 红色 */
+    var LEVELS = [
+        { min: 80, label: '正常', cls: 'lv-ok',     icon: 'fluent:shield-checkmark-20-regular' },
+        { min: 60, label: '黄色', cls: 'lv-warn',   icon: 'fluent:warning-20-regular' },
+        { min: 40, label: '橙色', cls: 'lv-orange', icon: 'fluent:warning-20-regular' },
+        { min: 0,  label: '红色', cls: 'lv-danger', icon: 'fluent:error-circle-20-regular' },
+    ];
+
+    /** 根据分数取警示等级（自高到低匹配） */
+    function levelOf(score) {
+        for (var i = 0; i < LEVELS.length; i++) {
+            if (score >= LEVELS[i].min) return LEVELS[i];
+        }
+        return LEVELS[LEVELS.length - 1];
+    }
+
+    /** 渲染结果：警示等级 + 分数 + 逐项列表 */
     function renderResult(score, results) {
         resultEl.hidden = false;
         scoreEl.textContent = score;
+        var lv = levelOf(score);
+
+        // 等级标签 + 分数配色跟随等级
+        badgeEl.className = 'result-badge ' + lv.cls;
+        badgeEl.innerHTML = '<iconify-icon icon="' + lv.icon + '"></iconify-icon>' + lv.label;
+        scoreEl.className = 'result-score ' + lv.cls;
 
         listEl.innerHTML = '';
         WEIGHTS.forEach(function (w) {
@@ -337,6 +290,71 @@
             li.querySelector('.result-detail').textContent = r.detail;
             listEl.appendChild(li);
         });
+
+        saveLastResult(score, lv, results);
+    }
+
+    /* ================= 上次检测结果缓存 =================
+       localStorage 缓存最近一次检测（分数 / 等级 / 各项结果），
+       页面刷新后自动回显 */
+    var LAST_RESULT_KEY = 'aegis_conn_last_result';
+
+    function saveLastResult(score, lv, results) {
+        try {
+            var payload = {
+                ts: Date.now(),
+                score: score,
+                levelLabel: lv.label,
+                levelCls: lv.cls,
+                country: countryInput.value,
+                items: WEIGHTS.map(function (w) {
+                    return {
+                        label: w.label,
+                        icon: w.icon,
+                        pass: !!results[w.key].pass,
+                        detail: results[w.key].detail,
+                    };
+                }),
+            };
+            localStorage.setItem(LAST_RESULT_KEY, JSON.stringify(payload));
+        } catch (e) { /* 存储满 / 禁用时静默忽略 */ }
+    }
+
+    /** 页面加载时回显上次检测结果（无缓存则保持隐藏） */
+    function restoreLastResult() {
+        try {
+            var raw = localStorage.getItem(LAST_RESULT_KEY);
+            if (!raw) return;
+            var c = JSON.parse(raw);
+            if (!c || !c.items || !c.items.length) return;
+
+            resultEl.hidden = false;
+            scoreEl.textContent = c.score;
+            badgeEl.className = 'result-badge ' + (c.levelCls || 'lv-ok');
+            badgeEl.innerHTML = '<iconify-icon icon="' +
+                (c.levelCls === 'lv-danger' ? 'fluent:error-circle-20-regular'
+                    : c.levelCls === 'lv-orange' || c.levelCls === 'lv-warn' ? 'fluent:warning-20-regular'
+                    : 'fluent:shield-checkmark-20-regular') + '"></iconify-icon>' +
+                (c.levelLabel || '正常');
+            scoreEl.className = 'result-score ' + (c.levelCls || 'lv-ok');
+
+            listEl.innerHTML = '';
+            c.items.forEach(function (it) {
+                var li = document.createElement('li');
+                li.className = 'result-item ' + (it.pass ? 'pass' : 'fail');
+                li.innerHTML =
+                    '<span class="result-icon">' +
+                    '<iconify-icon icon="' + (it.pass ? 'fluent:checkmark-circle-20-filled' : 'fluent:dismiss-circle-20-filled') + '"></iconify-icon>' +
+                    '</span>' +
+                    '<div class="result-body">' +
+                    '<div class="result-label"><iconify-icon icon="' + (it.icon || 'fluent:info-20-regular') + '"></iconify-icon>' + it.label + '</div>' +
+                    '<div class="result-detail"></div>' +
+                    '</div>' +
+                    '<span class="result-state">' + (it.pass ? '通过' : '未通过') + '</span>';
+                li.querySelector('.result-detail').textContent = it.detail || '';
+                listEl.appendChild(li);
+            });
+        } catch (e) { /* 忽略损坏缓存 */ }
     }
 
     /* ================= 自有服务端请求节流 =================
@@ -413,11 +431,6 @@
             var byKey = { country: results[0], network: results[1], dns: results[2], doh: results[3] };
             var score = computeScore(byKey);
 
-            // 风险度 → 红色粒子占比（0 的越多越红）
-            var fails = 0;
-            Object.keys(byKey).forEach(function (k) { if (!byKey[k].pass) fails++; });
-            setRisk(fails / Object.keys(byKey).length);
-
             leaveDetecting();
             renderResult(score, byKey);
         }).catch(function () {
@@ -435,8 +448,5 @@
     againBtn.addEventListener('click', run);
 
     /* ================= 初始化 ================= */
-    initParticles();
-    resize();
-    draw();
-    window.addEventListener('resize', resize);
+    restoreLastResult();   // 回显上次检测结果（若有缓存）
 })();

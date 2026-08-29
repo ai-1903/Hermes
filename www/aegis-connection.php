@@ -3,10 +3,11 @@
  * aegis-connection.php — 连接安全检测（视图入口）
  *
  * 分层：view 入口（展示）
- * 职责：全屏 Hero 布局——左侧巨大标题 + 国家选择 + 「检查安全」按钮，
- *       右侧矢量自旋粒子团（canvas）。点击检查后标题向中心渐隐，
- *       粒子团移至屏幕中心并显示「正在检测」；检测完成展示加权分数
- *       与逐项通过 / 失败列表。逻辑在 resources/js/aegis-connection.js。
+ * 职责：全屏居中 Hero 布局——巨大标题 + 描述 + 国家选择 + 「检查安全」按钮。
+ *       点击检查后标题渐隐并显示「正在检测」；检测完成展示加权分数
+ *       （正常 / 黄 / 橙 / 红警示分级）与逐项通过 / 失败列表。
+ *       上次检测结果缓存于 localStorage，刷新后自动回显。
+ *       逻辑在 resources/js/aegis-connection.js。
  */
 require __DIR__ . '/system/App.php';
 
@@ -22,10 +23,9 @@ require __DIR__ . '/view/header.php';
 ?>
 <main class="aegis-conn-main">
 
-    <!-- 英雄区：初始左右分栏，检测时聚向中心 -->
+    <!-- 英雄区：居中标题 + 控件 -->
     <section class="conn-hero" id="conn-hero">
 
-        <!-- 左侧：标题 + 按钮 + 国家选择 -->
         <div class="conn-intro" id="conn-intro">
             <h1 class="conn-title">连接安全检测</h1>
             <p class="conn-sub">我的网络安全吗？一键评估你的网络连接是否安全可信。</p>
@@ -59,21 +59,17 @@ require __DIR__ . '/view/header.php';
             </div>
         </div>
 
-        <!-- 右侧：矢量自旋粒子团（canvas 绘制） -->
-        <div class="conn-stage" id="conn-stage" aria-hidden="true">
-            <canvas id="conn-particles" class="conn-particles"></canvas>
-        </div>
-
-        <!-- 检测中：叠加在粒子团上的「正在检测」标题 -->
+        <!-- 检测中：居中「正在检测」标题 -->
         <div class="conn-detecting" id="conn-detecting" hidden>
             <div class="detecting-title">正在检测</div>
         </div>
 
     </section>
 
-    <!-- 检测结果：分数 + 逐项列表 -->
+    <!-- 检测结果：警示等级 + 分数 + 逐项列表 -->
     <section class="conn-result" id="conn-result" hidden>
         <div class="result-score-wrap">
+            <div class="result-badge" id="result-badge"></div>
             <div class="result-score" id="result-score">0</div>
             <div class="result-score-label">安全评分 / 100</div>
         </div>
