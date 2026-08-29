@@ -23,7 +23,18 @@ return [
             'groups' => [
                 [
                     'title' => '网络检测',
+                    'intro' => [
+                        '网络检测分类为你提供全面的网站与网络可达性诊断工具。',
+                        '从基础的在线状态探测、WHOIS 域名信息查询，到公网 IP 归属与运营商识别，',
+                        '所有检测均在浏览器本地完成，快速、私密、无需注册。',
+                    ],
                     'links' => [
+                        [
+                            'label' => '概览',
+                            'href'  => 'network-overview.php',
+                            'desc'  => '网络检测分类总览',
+                            'icon'  => 'fluent:apps-20-regular',
+                        ],
                         [
                             'label' => 'Online Test',
                             'href'  => 'online-test.php',
@@ -52,7 +63,18 @@ return [
             'groups' => [
                 [
                     'title' => '雅努斯之门',
+                    'intro' => [
+                        '雅努斯之门汇集面向开发与创作的实用工具。',
+                        '从代码辅助、数据可视化编辑，到色彩编码转换，',
+                        '为你日常开发与设计工作提供一站式便捷入口。',
+                    ],
                     'links' => [
+                        [
+                            'label' => '概览',
+                            'href'  => 'janus-overview.php',
+                            'desc'  => '雅努斯之门分类总览',
+                            'icon'  => 'fluent:apps-20-regular',
+                        ],
                         [
                             'label' => 'Coder',
                             'href'  => 'coder.php',

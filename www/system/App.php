@@ -40,4 +40,35 @@ final class App
             'year'      => (int) date('Y'),
         ];
     }
+
+    /**
+     * 组装分类概览数据。
+     * 找到一级菜单下指定标题的 group，返回其介绍与功能项（去掉「概览」自身）。
+     * @param string $menuLabel 一级菜单标签（如「网络工具」）
+     * @param string $groupTitle 分组标题（如「网络检测」）
+     * @return array|null { title, intro, items }；找不到返回 null
+     */
+    public static function overview(string $menuLabel, string $groupTitle): ?array
+    {
+        foreach (self::config()['nav'] as $menu) {
+            if ($menu['label'] !== $menuLabel || empty($menu['groups'])) {
+                continue;
+            }
+            foreach ($menu['groups'] as $group) {
+                if ($group['title'] !== $groupTitle) {
+                    continue;
+                }
+                // 过滤掉「概览」自身项
+                $items = array_values(array_filter($group['links'] ?? [], function ($link) {
+                    return ($link['label'] ?? '') !== '概览';
+                }));
+                return [
+                    'title' => $group['title'] ?? $groupTitle,
+                    'intro' => $group['intro'] ?? [],
+                    'items' => $items,
+                ];
+            }
+        }
+        return null;
+    }
 }

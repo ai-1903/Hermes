@@ -1,0 +1,115 @@
+/* ==========================================================================
+   overview.css — 分类概览页样式（通用组件）
+   类别：页面（category-overview 视图专用，各分类概览复用）
+   布局：顶部横排大图标块（横向居中）+ 下方分类介绍
+   ========================================================================== */
+
+.overview-main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    padding: 56px 24px 72px;
+}
+
+.overview-inner {
+    width: 100%;
+    max-width: 920px;
+}
+
+/* ---------- 顶部横排：大图标 + 文字块，横向居中 ---------- */
+.overview-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 22px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 36px;
+}
+
+.ov-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 160px;
+    padding: 26px 16px 22px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    text-decoration: none;
+    color: var(--text);
+    box-shadow: var(--shadow-card);
+    transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+    text-align: center;
+}
+
+.ov-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(34, 211, 238, 0.4);
+    box-shadow: 0 0 26px rgba(34, 211, 238, 0.14);
+}
+
+.ov-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 68px;
+    height: 68px;
+    border-radius: 20px;
+    background: rgba(34, 211, 238, 0.1);
+    color: var(--accent);
+    font-size: 2.3rem;
+    transition: background 0.15s, color 0.15s;
+}
+
+.ov-card:hover .ov-icon {
+    background: rgba(34, 211, 238, 0.18);
+}
+
+.ov-name {
+    font-size: 1.02rem;
+    font-weight: 600;
+}
+
+.ov-desc {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.45;
+    min-height: 2.3em;
+}
+
+/* ---------- 下方：分类介绍 ---------- */
+.overview-intro {
+    max-width: 680px;
+    margin: 0 auto;
+}
+
+.ov-intro-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.ov-intro-title iconify-icon {
+    color: var(--accent);
+    font-size: 1.2rem;
+}
+
+.ov-intro-para {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.8;
+    margin-bottom: 12px;
+}
+
+/* ---------- 移动端 ---------- */
+@media (max-width: 620px) {
+    .overview-main { padding: 40px 18px 56px; }
+    .ov-card { width: 44%; }
+}
