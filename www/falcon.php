@@ -20,7 +20,7 @@ require __DIR__ . '/view/header.php';
 ?>
 <main class="tool-main">
     <div class="tool-card">
-        <h2 class="tool-title">天隼</h2>
+        <h2 class="tool-title"><iconify-icon icon="fluent:location-20-filled"></iconify-icon> 天隼</h2>
         <p class="tool-desc">获取当前访问者的公网 IP 与服务商信息。</p>
 
         <button id="fc-btn" class="tool-btn ip-btn" type="button">获取我的公网 IP</button>

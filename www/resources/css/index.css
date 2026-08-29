@@ -1,6 +1,6 @@
 /* ==========================================================================
-   index.css — 首页页面样式
-   类别：页面（index.php 专属：site-main / card / badge / time）
+   index.css — 首页页面样式（苹果风 Hero + 功能入口）
+   类别：页面（index.php 专属）
    ========================================================================== */
 
 .site-main {
@@ -8,40 +8,78 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 24px;
+    padding: 40px 24px;
 }
 
-.card {
-    background: var(--card-bg);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--card-border);
-    border-radius: 16px;
-    padding: 48px 56px;
+.hero {
+    max-width: 760px;
     text-align: center;
-    box-shadow: var(--shadow);
 }
 
-.card h1 {
-    font-size: 3rem;
-    letter-spacing: 2px;
-    background: var(--accent-grad);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 12px;
+.hero-icon {
+    font-size: 3.2rem;
+    color: var(--accent);
+    margin-bottom: 16px;
 }
 
-.badge {
+.hero h1 {
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+}
+
+.hero-sub {
+    margin: 14px auto 34px;
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+    max-width: 520px;
+}
+
+.hero-cta {
     display: inline-block;
-    margin: 8px 4px;
-    padding: 6px 16px;
-    border-radius: 999px;
-    font-size: 0.85rem;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 12px 30px;
+    border-radius: var(--radius-pill);
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: background 0.2s;
 }
 
-.badge.green { color: var(--green); border-color: #81c78466; }
-.badge.blue  { color: var(--blue); border-color: #64b5f666; }
+.hero-cta:hover { background: var(--accent-hover); }
 
-.time { margin-top: 20px; font-size: 0.9rem; opacity: 0.75; }
+.hero-cta .cta-icon { vertical-align: -0.15em; }
+
+/* 功能入口卡片 */
+.entry-grid {
+    margin-top: 48px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    text-align: left;
+}
+
+.entry-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 20px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    color: var(--text);
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.entry-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card);
+}
+
+.entry-card iconify-icon { font-size: 26px; color: var(--accent); flex-shrink: 0; }
+
+.entry-card-title { font-size: 0.98rem; font-weight: 600; }
+
+.entry-card-desc { font-size: 0.8rem; color: var(--text-secondary); }

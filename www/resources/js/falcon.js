@@ -1,7 +1,8 @@
 /**
  * falcon.js — 天隼 页面逻辑（纯前端，不依赖服务器）
  * 类别：页面
- * 职责：获取访问者公网 IP 与服务商信息（多数据源依次兜底）
+ * 职责：获取访问者公网 IP 与服务商信息（多数据源依次兜底），
+ *       以带图标表头的 <table> 展示结果。
  */
 (function () {
     'use strict';
@@ -46,6 +47,35 @@
         }, Promise.reject());
     }
 
+    function renderTable(ip, isp) {
+        var wrap = document.createElement('div');
+        wrap.className = 'tool-table-wrap';
+        var table = document.createElement('table');
+        table.className = 'tool-table';
+        var thead = document.createElement('thead');
+        var trH = document.createElement('tr');
+        var thA = document.createElement('th');
+        thA.innerHTML = '<span class="th-inner"><iconify-icon icon="fluent:globe-20-filled"></iconify-icon> 公网 IP</span>';
+        var thB = document.createElement('th');
+        thB.innerHTML = '<span class="th-inner"><iconify-icon icon="fluent:building-bank-20-filled"></iconify-icon> 服务商</span>';
+        trH.appendChild(thA);
+        trH.appendChild(thB);
+        thead.appendChild(trH);
+        table.appendChild(thead);
+        var tbody = document.createElement('tbody');
+        var tr = document.createElement('tr');
+        var tdA = document.createElement('td');
+        tdA.textContent = ip;
+        var tdB = document.createElement('td');
+        tdB.textContent = isp;
+        tr.appendChild(tdA);
+        tr.appendChild(tdB);
+        tbody.appendChild(tr);
+        table.appendChild(tbody);
+        wrap.appendChild(table);
+        return wrap;
+    }
+
     function run() {
         btn.disabled = true;
         btn.textContent = '正在获取 …';
@@ -55,17 +85,7 @@
             btn.disabled = false;
             btn.textContent = '重新获取';
             result.innerHTML = '';
-
-            var ip = document.createElement('div');
-            ip.className = 'ip-value';
-            ip.textContent = info.ip;
-
-            var meta = document.createElement('div');
-            meta.className = 'ip-meta';
-            meta.textContent = info.isp;
-
-            result.appendChild(ip);
-            result.appendChild(meta);
+            result.appendChild(renderTable(info.ip, info.isp));
         }).catch(function () {
             btn.disabled = false;
             btn.textContent = '获取失败，重试';

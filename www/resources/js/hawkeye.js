@@ -2,10 +2,8 @@
  * hawkeye.js — Hawkeye 页面逻辑（纯前端 RDAP 查询，不依赖服务器）
  * 类别：页面
  * 依赖：lib/network.js
- * 职责：仅支持根域名；通过公共 RDAP 服务查询 Whois 信息并列表展示
- *
- * 说明：浏览器 JS 无法直连 43 端口，改用支持 CORS 的公共 RDAP 服务
- *       （rdap.org 按 TLD 路由；备选 Verisign 的 com/net 端点）。
+ * 职责：仅支持根域名；通过公共 RDAP 服务查询 Whois 信息，以带图标表头的
+ *       <table> 展示（表头图标来自 iconify:fluent）。
  */
 (function () {
     'use strict';
@@ -20,6 +18,18 @@
         'https://rdap.verisign.com/com/v1/domain/{domain}',
         'https://rdap.verisign.com/net/v1/domain/{domain}',
     ];
+
+    /** 字段 → { label, icon }（fluent 图标） */
+    var FIELD_META = {
+        '域名':    { icon: 'fluent:globe-20-filled' },
+        '注册商':  { icon: 'fluent:briefcase-20-filled' },
+        '状态':    { icon: 'fluent:checkmark-circle-20-filled' },
+        '注册时间': { icon: 'fluent:calendar-edit-20-filled' },
+        '过期时间': { icon: 'fluent:calendar-arrow-right-20-filled' },
+        '更新时间': { icon: 'fluent:clock-20-filled' },
+        'Name Server': { icon: 'fluent:server-20-filled' },
+        'DNSSEC': { icon: 'fluent:shield-checkmark-20-filled' },
+    };
 
     function escapeHtml(s) {
         return String(s).replace(/[&<>"']/g, function (c) {
@@ -41,7 +51,7 @@
         }, Promise.reject());
     }
 
-    /** 将 RDAP 结果映射为 Whois 键值列表 */
+    /** 将 RDAP 结果映射为字段数组 */
     function mapWhois(data) {
         var rows = [];
         function row(k, v, isHtml) {
@@ -95,24 +105,48 @@
         result.appendChild(d);
     }
 
-    function renderRows(rows) {
+    /** 以表格渲染（表头带 iconify 图标） */
+    function renderTable(rows) {
         result.innerHTML = '';
         if (!rows.length) { showMsg('未查询到可展示的 Whois 信息'); return; }
-        var list = document.createElement('ul');
-        list.className = 'whois-list';
+
+        var wrap = document.createElement('div');
+        wrap.className = 'tool-table-wrap';
+
+        var table = document.createElement('table');
+        table.className = 'tool-table';
+
+        var thead = document.createElement('thead');
+        var trHead = document.createElement('tr');
+        var thK = document.createElement('th');
+        thK.innerHTML = '<span class="th-inner"><iconify-icon icon="fluent:tag-20-filled"></iconify-icon> 字段</span>';
+        var thV = document.createElement('th');
+        thV.innerHTML = '<span class="th-inner"><iconify-icon icon="fluent:info-20-filled"></iconify-icon> 内容</span>';
+        trHead.appendChild(thK);
+        trHead.appendChild(thV);
+        thead.appendChild(trHead);
+        table.appendChild(thead);
+
+        var tbody = document.createElement('tbody');
         rows.forEach(function (r) {
-            var li = document.createElement('li');
-            var k = document.createElement('span');
-            k.className = 'k';
-            k.textContent = r.k;
-            var v = document.createElement('span');
-            v.className = 'v';
-            if (r.html) { v.innerHTML = r.v; } else { v.textContent = r.v; }
-            li.appendChild(k);
-            li.appendChild(v);
-            list.appendChild(li);
+            var meta = FIELD_META[r.k] || {};
+            var tr = document.createElement('tr');
+            var tdK = document.createElement('td');
+            tdK.className = 'k';
+            tdK.innerHTML =
+                '<span class="field-cell">' +
+                (meta.icon ? '<iconify-icon icon="' + meta.icon + '"></iconify-icon>' : '') +
+                escapeHtml(r.k) + '</span>';
+            var tdV = document.createElement('td');
+            if (r.html) { tdV.innerHTML = r.v; } else { tdV.textContent = r.v; }
+            tr.appendChild(tdK);
+            tr.appendChild(tdV);
+            tbody.appendChild(tr);
         });
-        result.appendChild(list);
+        table.appendChild(tbody);
+
+        wrap.appendChild(table);
+        result.appendChild(wrap);
     }
 
     function run() {
@@ -132,7 +166,7 @@
 
         query(value).then(function (data) {
             btn.disabled = false;
-            renderRows(mapWhois(data));
+            renderTable(mapWhois(data));
         }).catch(function () {
             btn.disabled = false;
             showMsg('未能查询到 ' + value + ' 的 Whois 信息（域名可能不存在或服务暂不可用）');

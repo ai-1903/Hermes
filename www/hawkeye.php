@@ -23,7 +23,7 @@ require __DIR__ . '/view/header.php';
 ?>
 <main class="tool-main">
     <div class="tool-card">
-        <h2 class="tool-title">Hawkeye</h2>
+        <h2 class="tool-title"><iconify-icon icon="fluent:eye-20-filled"></iconify-icon> Hawkeye</h2>
         <p class="tool-desc">查询域名的 Whois 注册信息（仅支持根域名，如 AB.XXX）。</p>
 
         <div class="tool-input-row">

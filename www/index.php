@@ -1,19 +1,18 @@
 <?php
 /**
- * index.php — 首页（入口视图）
+ * index.php — 首页（入口视图，苹果风）
  *
  * 分层：view 入口（展示）
- * 职责：仅负责组装并输出页面。数据来自 system/App，样式来自 resources/css，
- *       遵守 AGENTS.md 铁律：PHP 内不书写任何内联 CSS / JS。
+ * 职责：Hero 区 + 工具入口卡片。数据来自 system/App，样式来自 resources/css，
+ *       图标使用 iconify:fluent，遵守 AGENTS.md 铁律：PHP 内不书写任何内联 CSS / JS。
  */
 require __DIR__ . '/system/App.php';
 
 $app    = App::home();
 $footer = App::footer();
+$nav    = App::config()['nav'];
 
-// 传递给公共头部（view/header.php 约定）
 $siteName    = $app['title'];
-$nav         = App::config()['nav'];
 $pageTitle   = $app['title'] . ' — 首页';
 $pageStyles  = ['resources/css/index.css'];
 $pageScripts = [];
@@ -21,14 +20,32 @@ $pageScripts = [];
 require __DIR__ . '/view/header.php';
 ?>
 <main class="site-main">
-    <div class="card">
+    <div class="hero">
+        <iconify-icon class="hero-icon" icon="fluent:rocket-20-filled"></iconify-icon>
         <h1><?= htmlspecialchars($app['title'], ENT_QUOTES, 'UTF-8') ?></h1>
-        <div>
-            <span class="badge green">● Nginx 已运行</span>
-            <span class="badge green">● PHP <?= htmlspecialchars($app['phpVersion'], ENT_QUOTES, 'UTF-8') ?> 已运行</span>
-            <span class="badge blue">端口 9753</span>
+        <p class="hero-sub">简约、高效的网络工具集。在线检测、Whois 查询、公网 IP 定位，全部在浏览器本地完成。</p>
+        <a class="hero-cta" href="online-test.php">
+            <iconify-icon class="cta-icon" icon="fluent:arrow-right-20-filled"></iconify-icon>
+            开始使用网络工具
+        </a>
+
+        <div class="entry-grid">
+            <?php foreach ($nav as $item): ?>
+                <?php if (!empty($item['groups'])): ?>
+                    <?php foreach ($item['groups'] as $group): ?>
+                        <?php foreach ($group['links'] as $link): ?>
+                            <a class="entry-card" href="<?= htmlspecialchars($link['href'], ENT_QUOTES, 'UTF-8') ?>">
+                                <iconify-icon icon="<?= htmlspecialchars($link['icon'], ENT_QUOTES, 'UTF-8') ?>"></iconify-icon>
+                                <span>
+                                    <div class="entry-card-title"><?= htmlspecialchars($link['label'], ENT_QUOTES, 'UTF-8') ?></div>
+                                    <div class="entry-card-desc"><?= htmlspecialchars($link['desc'] ?? '', ENT_QUOTES, 'UTF-8') ?></div>
+                                </span>
+                            </a>
+                        <?php endforeach; ?>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            <?php endforeach; ?>
         </div>
-        <p class="time">服务器时间：<?= htmlspecialchars($app['serverTime'], ENT_QUOTES, 'UTF-8') ?></p>
     </div>
 </main>
 <?php

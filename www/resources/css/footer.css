@@ -1,28 +1,25 @@
 /* ==========================================================================
-   footer.css — 公共尾部组件
+   footer.css — 公共尾部组件（苹果风页脚）
    类别：组件（site-footer / copyright）
    ========================================================================== */
 
 .site-footer {
-    border-top: 1px solid var(--card-border);
-    background: rgba(0, 0, 0, 0.2);
-    padding: 20px 0;
+    margin-top: auto;
+    background: #fafafa;
+    border-top: 1px solid var(--border);
+    padding: 18px 0;
     text-align: center;
 }
 
 .copyright {
-    font-size: 0.85rem;
-    opacity: 0.75;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
 }
 
 .copyright a {
-    color: var(--text-color);
+    color: var(--text);
     text-decoration: none;
-    border-bottom: 1px solid transparent;
-    transition: border-bottom-color 0.2s, color 0.2s;
+    transition: color 0.2s;
 }
 
-.copyright a:hover {
-    color: var(--blue);
-    border-bottom-color: var(--blue);
-}
+.copyright a:hover { color: var(--accent); }

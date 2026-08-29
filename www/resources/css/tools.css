@@ -1,123 +1,128 @@
 /* ==========================================================================
-   tools.css — 网络工具页面共享样式
+   tools.css — 网络工具页面共享样式（苹果风）
    类别：页面（Online Test / Hawkeye / 天隼 共用布局）
    ========================================================================== */
 
 .tool-main {
     flex: 1;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    padding: 24px;
+    padding: 40px 24px;
 }
 
 .tool-card {
     width: 100%;
-    max-width: 620px;
-    background: var(--card-bg);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--card-border);
-    border-radius: 16px;
-    padding: 36px 40px;
-    box-shadow: var(--shadow);
+    max-width: 700px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 32px 36px;
+    box-shadow: var(--shadow-card);
 }
 
 .tool-title {
-    font-size: 1.6rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
     margin-bottom: 6px;
-    background: var(--accent-grad);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
 }
 
+.tool-title iconify-icon { color: var(--accent); font-size: 1.3rem; }
+
 .tool-desc {
-    font-size: 0.85rem;
-    opacity: 0.7;
-    margin-bottom: 24px;
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    margin-bottom: 26px;
 }
 
 /* 输入行：协议选项卡 + 输入框 + 按钮 */
 .tool-input-row {
     display: flex;
-    align-items: stretch;
+    align-items: center;
     gap: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 22px;
 }
 
 .proto-tabs {
     display: flex;
-    border: 1px solid var(--card-border);
+    background: rgba(0, 0, 0, 0.05);
     border-radius: 10px;
-    overflow: hidden;
+    padding: 3px;
     flex-shrink: 0;
 }
 
 .proto-tab {
-    padding: 0 14px;
+    padding: 7px 16px;
     background: transparent;
     border: none;
-    color: var(--text-color);
+    border-radius: 8px;
+    color: var(--text-secondary);
     font-size: 0.85rem;
+    font-weight: 500;
     cursor: pointer;
-    opacity: 0.6;
-    transition: background 0.15s, opacity 0.15s;
+    transition: background 0.15s, color 0.15s, box-shadow 0.15s;
 }
 
 .proto-tab.active {
-    background: rgba(100, 181, 246, 0.2);
-    opacity: 1;
+    background: #fff;
+    color: var(--text);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
 }
 
 .tool-input {
     flex: 1;
     min-width: 0;
-    padding: 12px 16px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid var(--card-border);
+    padding: 11px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
     border-radius: 10px;
-    color: var(--text-color);
+    color: var(--text);
     font-size: 0.95rem;
     outline: none;
-    transition: border-color 0.15s;
+    transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .tool-input:focus {
-    border-color: var(--blue);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
 }
 
-.tool-input::placeholder {
-    color: rgba(232, 240, 243, 0.4);
-}
+.tool-input::placeholder { color: var(--text-secondary); opacity: 0.7; }
 
 .tool-btn {
-    padding: 12px 22px;
-    background: linear-gradient(90deg, #64b5f6, #4dd0e1);
-    color: #0f2027;
-    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 11px 24px;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.92rem;
     border: none;
-    border-radius: 10px;
+    border-radius: var(--radius-pill);
     cursor: pointer;
     flex-shrink: 0;
-    transition: filter 0.15s, transform 0.05s;
+    transition: background 0.2s, transform 0.05s;
 }
 
-.tool-btn:hover { filter: brightness(1.08); }
+.tool-btn:hover { background: var(--accent-hover); }
 .tool-btn:active { transform: scale(0.97); }
 .tool-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* 检测结果 */
-.tool-result {
-    margin-bottom: 20px;
-}
+.tool-result { margin-bottom: 22px; }
 
 .result-summary {
     display: inline-block;
     padding: 8px 18px;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     font-size: 0.95rem;
     font-weight: 600;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
 }
 
 .result-lines {
@@ -131,46 +136,57 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 14px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--card-border);
-    border-radius: 8px;
+    gap: 12px;
+    padding: 11px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
     font-size: 0.9rem;
 }
 
-.result-lines .host { word-break: break-all; }
+.result-lines .host {
+    word-break: break-all;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 0.85rem;
+}
 
 /* 状态徽标 */
 .st {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
     padding: 3px 12px;
-    border-radius: 999px;
-    font-size: 0.8rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.78rem;
     font-weight: 600;
+    white-space: nowrap;
 }
 
-.st-online        { color: var(--green); border: 1px solid #81c78466; background: rgba(129, 199, 132, 0.1); }
-.st-offline       { color: #e57373; border: 1px solid #e5737366; background: rgba(229, 115, 115, 0.1); }
-.st-local-online  { color: #ffb74d; border: 1px solid #ffb74d66; background: rgba(255, 183, 77, 0.1); }
-.st-local-offline { color: #e57373; border: 1px solid #e5737366; background: rgba(229, 115, 115, 0.1); }
-.st-loopback      { color: var(--blue); border: 1px solid #64b5f666; background: rgba(100, 181, 246, 0.1); }
+.st-online        { color: var(--green); background: rgba(52, 199, 89, 0.12); }
+.st-offline       { color: var(--red);   background: rgba(255, 59, 48, 0.1); }
+.st-local-online  { color: var(--orange); background: rgba(255, 149, 0, 0.12); }
+.st-local-offline { color: var(--red);   background: rgba(255, 59, 48, 0.1); }
+.st-loopback      { color: var(--blue);  background: rgba(0, 122, 255, 0.1); }
 
 /* 历史记录 */
 .history-wrap {
-    border-top: 1px solid var(--card-border);
-    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    padding-top: 18px;
 }
 
 .history-title {
-    font-size: 0.85rem;
-    opacity: 0.7;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.84rem;
     font-weight: 600;
-    margin-bottom: 10px;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
 }
 
 .history-list {
     list-style: none;
-    max-height: 220px;
+    max-height: 224px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
@@ -183,15 +199,15 @@
     align-items: center;
     gap: 10px;
     padding: 8px 12px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid var(--card-border);
-    border-radius: 8px;
-    font-size: 0.85rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    font-size: 0.84rem;
 }
 
 .history-proto {
     flex-shrink: 0;
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     font-weight: 700;
     color: var(--blue);
     opacity: 0.9;
@@ -201,128 +217,157 @@
     flex: 1;
     min-width: 0;
     word-break: break-all;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 0.8rem;
     cursor: pointer;
 }
 
-.history-host:hover { color: var(--blue); }
+.history-host:hover { color: var(--accent); }
 
-.history-status {
-    flex-shrink: 0;
-}
+.history-status { flex-shrink: 0; }
 
 .history-time {
     flex-shrink: 0;
     font-size: 0.72rem;
-    opacity: 0.5;
+    color: var(--text-secondary);
 }
 
 .history-del {
     flex-shrink: 0;
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
     line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     background: transparent;
     border: none;
-    color: rgba(232, 240, 243, 0.5);
-    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-size: 1rem;
     cursor: pointer;
     border-radius: 50%;
     transition: background 0.15s, color 0.15s;
 }
 
 .history-del:hover {
-    background: rgba(229, 115, 115, 0.2);
-    color: #e57373;
+    background: rgba(255, 59, 48, 0.12);
+    color: var(--red);
 }
 
 .history-empty {
     font-size: 0.8rem;
-    opacity: 0.5;
+    color: var(--text-secondary);
     padding: 8px 0;
 }
 
 .history-loading {
     font-size: 0.85rem;
-    opacity: 0.6;
+    color: var(--text-secondary);
     padding: 8px 0;
 }
 
-/* Hawkeye：Whois 列表 */
-.whois-result { margin-top: 4px; }
-
-.whois-list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+/* ---------- 数据表格（Hawkeye 等） ---------- */
+.tool-table-wrap {
+    overflow-x: auto;
+    margin-top: 6px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
 }
 
-.whois-list li {
-    display: flex;
-    padding: 10px 14px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--card-border);
-    border-radius: 8px;
-    font-size: 0.9rem;
+table.tool-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
 }
 
-.whois-list .k {
-    flex-shrink: 0;
-    width: 110px;
-    opacity: 0.6;
+.tool-table thead th {
+    text-align: left;
+    padding: 12px 16px;
+    background: #fafafa;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 0.03em;
 }
 
-.whois-list .v {
-    flex: 1;
-    min-width: 0;
+/* 表头图标：表头内容居中配图标，单元格文本仍左对齐 */
+.tool-table th .th-inner {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tool-table th iconify-icon { font-size: 14px; color: var(--accent); }
+
+.tool-table tbody td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
     word-break: break-all;
-    color: var(--text-color);
 }
 
-.whois-list .ns-item {
+.tool-table tbody tr:last-child td { border-bottom: none; }
+
+.tool-table tbody tr:hover td { background: rgba(0, 0, 0, 0.015); }
+
+.tool-table .k { color: var(--text-secondary); white-space: nowrap; }
+
+/* 字段单元格（键名 + 图标） */
+.tool-table .field-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tool-table .field-cell iconify-icon { font-size: 14px; color: var(--accent); }
+
+.tool-table .ns-item {
     display: inline-block;
     margin: 2px 6px 2px 0;
     padding: 2px 10px;
-    background: rgba(100, 181, 246, 0.12);
-    border-radius: 999px;
-    font-size: 0.8rem;
+    background: rgba(0, 122, 255, 0.08);
+    color: var(--blue);
+    border-radius: var(--radius-pill);
+    font-size: 0.78rem;
 }
 
-.whois-empty {
-    font-size: 0.85rem;
-    opacity: 0.6;
-    padding: 8px 0;
-}
-
-/* 天隼：IP 显示 */
+/* 天隼 */
 .ip-btn { margin-bottom: 24px; }
 
 .ip-result {
     text-align: center;
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px dashed var(--card-border);
-    border-radius: 12px;
+    padding: 24px;
+    background: var(--bg);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-md);
 }
 
 .ip-placeholder {
     font-size: 0.9rem;
-    opacity: 0.5;
+    color: var(--text-secondary);
 }
 
 .ip-value {
     font-size: 2rem;
     font-weight: 700;
-    letter-spacing: 1px;
-    background: var(--accent-grad);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    letter-spacing: 0.5px;
+    color: var(--text);
     margin-bottom: 12px;
     word-break: break-all;
 }
 
 .ip-meta {
     font-size: 0.9rem;
-    opacity: 0.8;
+    color: var(--text-secondary);
+}
+
+/* 通配符结果（Online Test） */
+.wild-loading { font-size: 0.85rem; color: var(--text-secondary); padding: 8px 0; }
+
+/* 移动端适配 */
+@media (max-width: 620px) {
+    .tool-card { padding: 24px 20px; }
+    .tool-input-row { flex-wrap: wrap; }
+    .tool-input { min-width: 100%; }
 }

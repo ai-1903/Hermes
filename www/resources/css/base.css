@@ -1,33 +1,58 @@
 /* ==========================================================================
-   base.css — 全局基础样式
-   类别：全局 / 基础（重置、变量、排版、通用容器）
+   base.css — 全局基础样式（苹果官网风格：简约、大气、浅色）
+   类别：全局 / 基础（变量、重置、排版、通用容器）
    ========================================================================== */
 
 :root {
-    --bg-gradient: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-    --text-color: #e8f0f3;
-    --card-bg: rgba(255, 255, 255, 0.06);
-    --card-border: rgba(255, 255, 255, 0.12);
-    --shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-    --green: #81c784;
-    --blue: #64b5f6;
-    --accent-grad: linear-gradient(90deg, #64b5f6, #4dd0e1);
+    --bg: #f5f5f7;                    /* 苹果经典浅灰背景 */
+    --bg-elevated: #ffffff;           /* 卡片 / 面板 */
+    --text: #1d1d1f;                  /* 苹果主文字 */
+    --text-secondary: #6e6e73;        /* 次级文字 */
+    --border: rgba(0, 0, 0, 0.08);    /* 极细分割线 */
+    --accent: #0071e3;                /* 苹果蓝 */
+    --accent-hover: #0077ed;
+    --green: #34c759;
+    --red: #ff3b30;
+    --orange: #ff9500;
+    --blue: #007aff;
+    --radius-lg: 18px;
+    --radius-md: 12px;
+    --radius-pill: 980px;
+    --shadow-card: 0 2px 16px rgba(0, 0, 0, 0.06);
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+            "Segoe UI", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
-                 "Microsoft YaHei", sans-serif;
-    background: var(--bg-gradient);
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    color: var(--text-color);
+    line-height: 1.5;
 }
 
 .container {
-    max-width: 960px;
+    max-width: 1100px;
     margin: 0 auto;
     padding: 0 24px;
+    width: 100%;
+}
+
+/* Iconify 图标内联对齐 */
+iconify-icon { vertical-align: -0.125em; }
+
+/* 焦点可见性（苹果风蓝色光晕） */
+:focus-visible {
+    outline: 3px solid rgba(0, 113, 227, 0.35);
+    outline-offset: 2px;
+    border-radius: 4px;
 }

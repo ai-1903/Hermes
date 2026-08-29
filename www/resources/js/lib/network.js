@@ -44,6 +44,32 @@
         return Network.isIPv4(ip) && ip.split('.')[0] === '127';
     };
 
+    /** 是否通配符域名（如 *.example.com / *.AB.XXX） */
+    Network.isWildcard = function (input) {
+        var s = String(input || '').trim().toLowerCase();
+        if (s.indexOf('*') === -1) return false;
+        if (s.indexOf('*') !== 0 || s.charAt(1) !== '.') return false; // 仅支持 * 前缀
+        return DOMAIN_RE.test(s.slice(2));
+    };
+
+    /** 通配符域名对应的根域（*.a.b.c → a.b.c） */
+    Network.wildcardRoot = function (input) {
+        var s = String(input || '').trim().toLowerCase();
+        return s.replace(/^\*\./, '');
+    };
+
+    /** 常见子域名字典（通配符探测候选） */
+    Network.SUBDOMAINS = [
+        'www', 'mail', 'webmail', 'ftp', 'blog', 'shop', 'store', 'api', 'app',
+        'm', 'mobile', 'dev', 'staging', 'test', 'demo', 'cpanel', 'web', 'vpn',
+        'portal', 'login', 'admin', 'support', 'help', 'docs', 'cdn', 'static',
+        'img', 'images', 'media', 'video', 'download', 'forum', 'community',
+        'news', 'status', 'track', 'gateway', 'portal2', 'shop2', 'secure',
+        'sso', 'oauth', 'id', 'account', 'billing', 'pay', 'payment', 'git',
+        'status', 'grafana', 'kibana', 'jenkins', 'ns1', 'ns2', 'ns3', 'dns',
+    ];
+
+
     /** 是否内网 / 私有地址 */
     Network.isPrivateIP = function (ip) {
         if (!Network.isIPv4(ip)) return false;
