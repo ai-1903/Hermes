@@ -212,12 +212,22 @@
 
     /* 移动端展开高度更大：容纳一级列表 + 二级分栏 */
     .nav-bar.open {
-        height: 560px;
+        height: 460px;
     }
 
-    /* 一级菜单项：移动端默认隐藏，容器展开后显示为纵向列表 */
+    /* nav-top 允许换行：第一行 LOGO+汉堡，一级列表换到下一行整宽 */
+    .nav-top {
+        flex-wrap: wrap;
+        height: auto;
+        min-height: 54px;
+        padding-top: 7px;
+        padding-bottom: 7px;
+    }
+
+    /* 一级菜单项：移动端默认隐藏，容器展开后显示为纵向整行列 */
     .nav-links {
         display: none;
+        order: 3;
         width: 100%;
         flex-direction: column;
         align-items: stretch;

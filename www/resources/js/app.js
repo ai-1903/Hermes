@@ -1,12 +1,11 @@
 /**
  * app.js — 公共脚本入口
  * 类别：全局 / 公共
- * 职责：主菜单栏（.nav-bar）「向下拉伸」交互：
- *   - 悬停 / 点击带二级菜单的一级项 → 主菜单栏向下拉伸（.open），
- *     并在新开辟空间显示对应 .mega-panel（.active）
- *   - 点击汉堡按钮 → 切换主菜单栏拉伸（移动端同时展开一级列表）
- *   - 点击外部 / Esc / 移出主菜单栏 → 主菜单栏缩回原高度
- *   面板是 .nav-bar 内部区域，共用主菜单栏背景，无独立弹层。
+ * 职责：单一整体导航容器（.nav-bar）的展开 / 收起：
+ *   - 悬停 / 点击带二级菜单的一级项 → 容器变高（.open），显示对应面板（.active）
+ *   - 再点已展开的一级项 / 点击外部 / Esc / 移出容器 → 容器收起（高度缩回）
+ *   - 点击汉堡按钮 → 切换容器展开（移动端同时纵向列出一级菜单）
+ *   二级菜单在容器内部文档流，无独立弹层。
  */
 (function () {
     'use strict';
@@ -19,9 +18,8 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-        var navBar   = document.getElementById('nav-bar');
+        var navBar    = document.getElementById('nav-bar');
         var hamburger = document.querySelector('.hamburger');
-        var nav      = document.getElementById('site-nav');
 
         // 收集下拉项：{ item, btn, panel }
         var entries = Array.prototype.slice.call(
@@ -32,24 +30,17 @@
             return { item: item, btn: btn, panel: panel };
         }).filter(function (e) { return e.btn; });
 
-        function isOpen() {
-            return navBar && navBar.classList.contains('open');
-        }
-
-        /** 拉伸主菜单栏 */
-        function stretch() {
+        /** 打开某个一级项对应的面板 + 展开容器 */
+        function openPanel(entry) {
+            closePanels(entry);
+            entry.item.classList.add('open');
+            entry.btn.setAttribute('aria-expanded', 'true');
+            if (entry.panel) entry.panel.classList.add('active');
             if (navBar) navBar.classList.add('open');
         }
 
-        /** 收起主菜单栏 */
-        function collapse() {
-            if (navBar) navBar.classList.remove('open');
-            closeAll();
-            if (hamburger) hamburger.setAttribute('aria-expanded', 'false');
-        }
-
-        /** 关闭所有下拉面板（但保持主菜单栏拉伸态） */
-        function closeAll(except) {
+        /** 关闭所有面板（保留容器展开态） */
+        function closePanels(except) {
             entries.forEach(function (e) {
                 if (e !== except) {
                     e.item.classList.remove('open');
@@ -59,14 +50,11 @@
             });
         }
 
-        /** 激活某个面板 + 拉伸主菜单栏 */
-        function activate(entry) {
-            if (!entry) return;
-            closeAll(entry);
-            entry.item.classList.add('open');
-            entry.btn.setAttribute('aria-expanded', 'true');
-            if (entry.panel) entry.panel.classList.add('active');
-            stretch();
+        /** 收起容器（高度缩回）+ 关闭所有面板 */
+        function collapseNav() {
+            if (navBar) navBar.classList.remove('open');
+            closePanels();
+            if (hamburger) hamburger.setAttribute('aria-expanded', 'false');
         }
 
         function cancelClose() {
@@ -75,31 +63,32 @@
 
         function scheduleCollapse() {
             cancelClose();
-            closeTimer = setTimeout(collapse, 160);
+            closeTimer = setTimeout(collapseNav, 160);
         }
 
-        /* ---------- 汉堡按钮：切换主菜单栏拉伸 ---------- */
+        /* ---------- 汉堡按钮：切换容器展开 ---------- */
         if (hamburger && navBar) {
             hamburger.addEventListener('click', function (e) {
                 e.stopPropagation();
-                if (isOpen()) {
-                    collapse();
+                if (navBar.classList.contains('open')) {
+                    collapseNav();
                 } else {
-                    stretch();
+                    navBar.classList.add('open');
                     hamburger.setAttribute('aria-expanded', 'true');
                 }
             });
         }
 
-        /* ---------- 下拉项：悬停 / 点击拉伸并显示面板 ---------- */
+        /* ---------- 一级项：悬停 / 点击展开，再点收起 ---------- */
         entries.forEach(function (entry) {
             entry.btn.addEventListener('click', function (e) {
                 e.stopPropagation();
                 if (entry.item.classList.contains('open')) {
-                    closeAll();
-                    // 移动端：点开/收起面板（主菜单栏保持拉伸）
+                    // 再点已展开项：收起面板；桌面端同时收起整个容器
+                    closePanels();
+                    if (!isMobile()) collapseNav();
                 } else {
-                    activate(entry);
+                    openPanel(entry);
                 }
             });
 
@@ -107,12 +96,12 @@
             if (!isMobile()) {
                 entry.item.addEventListener('mouseenter', function () {
                     cancelClose();
-                    activate(entry);
+                    openPanel(entry);
                 });
             }
         });
 
-        /* ---------- 主菜单栏 hover 保持 / 移出收起 ---------- */
+        /* ---------- 容器 hover 保持 / 移出收起 ---------- */
         if (navBar) {
             navBar.addEventListener('mouseenter', cancelClose);
             navBar.addEventListener('mouseleave', scheduleCollapse);
@@ -121,20 +110,15 @@
         /* ---------- 点击外部 / Esc 收起 ---------- */
         document.addEventListener('click', function (e) {
             if (navBar && navBar.contains(e.target)) return;
-            collapse();
+            collapseNav();
         });
         document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') collapse();
+            if (e.key === 'Escape') collapseNav();
         });
-
-        /* ---------- 移动端点击一级项：在其下方展开/收起二级分栏 ---------- */
-        // 移动端下点击 nav-btn 已经走上面 handler：展开对应 panel。
 
         // 窗口尺寸变化：回到桌面时重置
         window.addEventListener('resize', function () {
-            if (!isMobile()) {
-                collapse();
-            }
+            if (!isMobile()) collapseNav();
         });
     });
 })();
