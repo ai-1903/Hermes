@@ -29,6 +29,15 @@
     overflow: hidden;
     /* 容器自身高度过渡：收起流畅（fixed height 而非 max-height） */
     transition: height 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+    /* 无论展开/收起，始终隐藏滚动条（内容仍可滚动） */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.nav-bar::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
 }
 
 /* 展开：高度由内容撑开（JS 测量 scrollHeight 并受上限约束）
