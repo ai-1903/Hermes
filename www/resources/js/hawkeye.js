@@ -23,6 +23,8 @@
     var FIELD_META = {
         '域名':    { icon: 'fluent:globe-20-regular' },
         '注册商':  { icon: 'fluent:briefcase-20-regular' },
+        '归属人':  { icon: 'fluent:person-20-regular' },
+        '邮箱':    { icon: 'fluent:mail-20-regular' },
         '状态':    { icon: 'fluent:checkmark-circle-20-regular' },
         '注册时间': { icon: 'fluent:calendar-edit-20-regular' },
         '过期时间': { icon: 'fluent:calendar-arrow-right-20-regular' },
@@ -51,6 +53,44 @@
         }, Promise.reject());
     }
 
+    /** 从 vCard 数组取指定属性值（返回去重后的非空数组） */
+    function vcardValues(vc, prop) {
+        var out = [];
+        (vc || []).forEach(function (item) {
+            if (item && item[0] === prop && item[3]) {
+                var v = String(item[3]).trim();
+                if (v && out.indexOf(v) === -1) out.push(v);
+            }
+        });
+        return out;
+    }
+
+    /** 从 entity 的 vcard 中取姓名（fn） */
+    function entityName(entity) {
+        var vc = entity && entity.vcardArray && entity.vcardArray[1];
+        var fns = vcardValues(vc, 'fn');
+        return fns.length ? fns.join('、') : null;
+    }
+
+    /** 从 entity 的 vcard 中取邮箱（email） */
+    function entityEmail(entity) {
+        var vc = entity && entity.vcardArray && entity.vcardArray[1];
+        var mails = vcardValues(vc, 'email');
+        return mails.length ? mails.join('、') : null;
+    }
+
+    /** 按角色优先级取首个匹配的 entity */
+    function entityByRoles(entities, roles) {
+        var list = entities || [];
+        for (var i = 0; i < list.length; i++) {
+            var e = list[i];
+            if (e.roles && e.roles.some(function (r) { return roles.indexOf(r) !== -1; })) {
+                return e;
+            }
+        }
+        return null;
+    }
+
     /** 将 RDAP 结果映射为字段数组 */
     function mapWhois(data) {
         var rows = [];
@@ -72,6 +112,27 @@
             if (!regName) regName = reg.handle;
         }
 
+        // 归属人（registrant；退而求其次取 administrative / technical）
+        var registrant = entityByRoles(data.entities, ['registrant']);
+        if (!registrant) {
+            registrant = entityByRoles(data.entities, ['administrative', 'technical']);
+        }
+        var ownerName = registrant ? entityName(registrant) : null;
+
+        // 邮箱（优先 registrant，其次 admin/tech/abuse）
+        var emailEntity = entityByRoles(data.entities, ['registrant'])
+            || entityByRoles(data.entities, ['administrative', 'technical'])
+            || entityByRoles(data.entities, ['abuse']);
+        var email = emailEntity ? entityEmail(emailEntity) : null;
+        if (!email) {
+            // 兜底：扫描所有 entity 的 vcard email
+            (data.entities || []).some(function (e) {
+                var m = entityEmail(e);
+                if (m) { email = m; return true; }
+                return false;
+            });
+        }
+
         function eventDate(action) {
             var evs = (data.events || []).filter(function (e) {
                 return e.eventAction === action;
@@ -81,6 +142,8 @@
 
         row('域名', data.ldhName || data.handle);
         row('注册商', regName);
+        row('归属人', ownerName);
+        row('邮箱', email);
         row('状态', (data.status || []).join('、'));
         row('注册时间', eventDate('registration'));
         row('过期时间', eventDate('expiration'));

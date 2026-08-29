@@ -228,6 +228,129 @@
         result.appendChild(wrap);
     }
 
+    /* ---------- 详情展示（解析 IP / 归属地 / 站点名 / SEO / 图标） ---------- */
+
+    /** 为在线目标抓取详情数据 */
+    function fetchDetails(it) {
+        if (it.status !== 'online' && it.status !== 'local-online') {
+            return Promise.resolve(null);
+        }
+        var host = it.host;
+        var url = N.probeUrl(currentProto, host, it.port);
+        return Promise.all([
+            N.resolveDNS(host),             // 解析 IP（IPv4 输入则原样）
+            N.fetchSiteMeta(url),           // 站点名 / SEO / 图标
+        ]).then(function (res) {
+            var ips = res[0] || [];
+            var meta = res[1] || {};
+            var ip = ips[0] || '';
+            return N.geoLookup(ip).then(function (geo) {
+                return {
+                    target: it.target,
+                    ips: ips,
+                    ip: ip,
+                    geo: geo,
+                    title: meta.title || '',
+                    description: meta.description || '',
+                    icon: meta.icon || '',
+                };
+            });
+        }).catch(function () {
+            return null;
+        });
+    }
+
+    /** 渲染详情卡片（挂在结果表下方） */
+    function renderDetails(detailsList) {
+        var valid = detailsList.filter(Boolean);
+        if (!valid.length) return;
+        var wrap = document.createElement('div');
+        wrap.className = 'ot-details';
+        valid.forEach(function (d) {
+            var card = document.createElement('div');
+            card.className = 'site-detail';
+
+            // 站点图标（无则用占位图标）
+            var iconBox = document.createElement('div');
+            iconBox.className = 'site-detail-icon';
+            if (d.icon) {
+                var img = document.createElement('img');
+                img.src = d.icon;
+                img.alt = '';
+                img.loading = 'lazy';
+                iconBox.appendChild(img);
+            } else {
+                iconBox.innerHTML = '<iconify-icon icon="fluent:globe-20-regular"></iconify-icon>';
+            }
+
+            var body = document.createElement('div');
+            body.className = 'site-detail-body';
+
+            // 站点名称行
+            var titleRow = document.createElement('div');
+            titleRow.className = 'site-detail-title';
+            if (d.title) {
+                var t = document.createElement('span');
+                t.className = 'site-detail-name';
+                t.textContent = d.title;
+                titleRow.appendChild(t);
+            }
+            var target = document.createElement('span');
+            target.className = 'site-detail-target mono';
+            target.textContent = d.target;
+            titleRow.appendChild(target);
+
+            // SEO 描述
+            if (d.description) {
+                var desc = document.createElement('div');
+                desc.className = 'site-detail-desc';
+                desc.textContent = d.description;
+                body.appendChild(desc);
+            }
+            body.appendChild(titleRow);
+
+            // 元信息：解析 IP + 归属地
+            var meta = document.createElement('div');
+            meta.className = 'site-detail-meta';
+            if (d.ips.length) {
+                var m1 = document.createElement('span');
+                m1.className = 'm';
+                m1.innerHTML = '<b>解析 IP</b> ' + d.ips.map(esc).join('、');
+                meta.appendChild(m1);
+            }
+            if (d.geo) {
+                var parts = [d.geo.country, d.geo.region, d.geo.city].filter(Boolean);
+                var loc = parts.join(' · ');
+                if (loc) {
+                    var m2 = document.createElement('span');
+                    m2.className = 'm';
+                    m2.innerHTML = '<b>归属地</b> ' + esc(loc);
+                    meta.appendChild(m2);
+                }
+                if (d.geo.isp) {
+                    var m3 = document.createElement('span');
+                    m3.className = 'm';
+                    var isCf = d.geo.isp.indexOf('Cloudflare') !== -1;
+                    m3.innerHTML = '<b>服务商</b> ' +
+                        (isCf ? '<span class="badge-cf">Cloudflare 代理</span>' : esc(d.geo.isp));
+                    meta.appendChild(m3);
+                }
+            }
+
+            body.appendChild(meta);
+            card.appendChild(iconBox);
+            card.appendChild(body);
+            wrap.appendChild(card);
+        });
+        result.appendChild(wrap);
+    }
+
+    function esc(s) {
+        return String(s).replace(/[&<>"']/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+    }
+
     /**
      * 通配符查询（*.AB.XXX，可带端口 *.AB.XXX:8443）：
      * 逐个尝试常见子域，探测出一个即动态插入表格行，直到全部完成。
@@ -378,6 +501,10 @@
         })).then(function (items) {
             btn.disabled = false;
             renderTable(items);
+            // 在线目标：抓取解析 IP / 归属地 / 站点名 / SEO / 图标
+            Promise.all(items.map(fetchDetails)).then(function (details) {
+                renderDetails(details);
+            });
             var t = now();
             if (isRoot && !port) {
                 // 合并为一条：*.XXX.XX，状态取任一在线即「在线」

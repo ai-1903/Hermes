@@ -52,7 +52,11 @@ $pageScripts = $pageScripts ?? [];
             <?= htmlspecialchars($siteName, ENT_QUOTES, 'UTF-8') ?>
         </a>
 
-        <nav class="nav">
+        <button type="button" class="hamburger" aria-label="打开菜单" aria-expanded="false">
+            <iconify-icon icon="fluent:list-20-regular"></iconify-icon>
+        </button>
+
+        <nav class="nav" id="site-nav">
             <?php foreach ($nav as $item): ?>
                 <?php if (!empty($item['groups'])): ?>
                     <div class="nav-item dropdown">

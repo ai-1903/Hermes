@@ -177,6 +177,78 @@
         });
     };
 
+    /* ---------- 域名解析（DNS-over-HTTPS） ---------- */
+
+    /**
+     * 通过 DoH（Cloudflare）解析域名的 A 记录，返回 IP 数组。
+     * 若输入本身是 IPv4，则直接返回 [ip]。
+     */
+    Network.resolveDNS = function (host) {
+        if (Network.isIPv4(host)) {
+            return Promise.resolve([host]);
+        }
+        var url = 'https://cloudflare-dns.com/dns-query?name=' +
+            encodeURIComponent(host) + '&type=A';
+        return fetch(url, { headers: { 'Accept': 'application/dns-json' } })
+            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+            .then(function (d) {
+                var ips = [];
+                (d.Answer || []).forEach(function (a) {
+                    if (a.type === 1 && a.data) ips.push(a.data);
+                });
+                return ips;
+            });
+    };
+
+    /* ---------- IP 归属查询 ---------- */
+
+    /** Cloudflare 代理判定关键字 */
+    var CLOUDFLARE_RE = /Cloudflare/i;
+
+    /**
+     * 查询 IP 归属地与服务商（ipapi.co，支持 CORS）。
+     * 若服务商为 Cloudflare，isp 标注为「Cloudflare 代理」。
+     * @returns {Promise<object|null>} { ip, isp, org, city, region, country }
+     */
+    Network.geoLookup = function (ip) {
+        if (!ip) return Promise.resolve(null);
+        return fetch('https://ipapi.co/' + encodeURIComponent(ip) + '/json/')
+            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+            .then(function (d) {
+                var org = d.org || '';
+                var isCF = CLOUDFLARE_RE.test(org);
+                return {
+                    ip: ip,
+                    org: org,
+                    isp: isCF ? 'Cloudflare 代理' : (org || ''),
+                    city: d.city,
+                    region: d.region,
+                    country: d.country_name || d.country_code,
+                };
+            })
+            .catch(function () { return null; });
+    };
+
+    /* ---------- 站点元数据（名称 / SEO / 图标） ---------- */
+
+    /**
+     * 通过 Microlink 抓取站点标题、SEO 描述与图标（服务端抓取，支持 CORS）。
+     * @returns {Promise<object|null>} { title, description, icon }
+     */
+    Network.fetchSiteMeta = function (url) {
+        return fetch('https://api.microlink.io/?url=' + encodeURIComponent(url))
+            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+            .then(function (d) {
+                var data = d.data || {};
+                return {
+                    title: data.title || '',
+                    description: data.description || '',
+                    icon: (data.logo && data.logo.url) || '',
+                };
+            })
+            .catch(function () { return null; });
+    };
+
     /** 状态展示映射 */
     Network.STATUS = {
         'online':        { text: '在线', cls: 'st-online' },

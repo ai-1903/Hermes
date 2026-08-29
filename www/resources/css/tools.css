@@ -252,3 +252,97 @@ table.tool-table {
     color: var(--text-secondary);
     padding: 8px 0;
 }
+
+/* ---------- 在线详情卡（解析 IP / 归属地 / 站点名 / SEO / 图标） ---------- */
+.ot-details {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.site-detail {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+}
+
+.site-detail-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(34, 211, 238, 0.1);
+    color: var(--accent);
+    font-size: 1.2rem;
+    overflow: hidden;
+}
+
+.site-detail-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.site-detail-body { flex: 1; min-width: 0; }
+
+.site-detail-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.site-detail-name { color: var(--text); }
+
+.site-detail-target {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    font-weight: 400;
+}
+
+.site-detail-desc {
+    margin-top: 3px;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.site-detail-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    margin-top: 9px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.site-detail-meta .m b {
+    color: var(--text);
+    font-weight: 600;
+    margin-right: 4px;
+}
+
+.site-detail-meta .m .mono {
+    font-family: var(--mono);
+    color: var(--accent);
+}
+
+.badge-cf {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: var(--radius-pill);
+    background: rgba(251, 191, 36, 0.15);
+    color: var(--orange);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
