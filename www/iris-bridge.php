@@ -25,6 +25,8 @@ require __DIR__ . '/view/header.php';
 ?>
 <main class="iris-main">
 
+    <div class="iris-body">
+
     <!-- 左：调色盘 + 透明度条 + 明度条 -->
     <section class="iris-picker">
         <canvas id="ir-picker" class="ir-picker-canvas" width="280" height="240"></canvas>
@@ -118,20 +120,18 @@ require __DIR__ . '/view/header.php';
 
     </section>
 
-    <!-- 底部横幅：色域提示（fixed 定位，不影响布局） -->
-    <div class="ir-banner" id="ir-banner-p3" hidden>
-        <iconify-icon icon="fluent:warning-20-regular"></iconify-icon>
-        <span class="ir-banner-text">当前颜色位于 P3 广色域，超出 sRGB 可表达范围，RGBA / HEX / CMYK 显示为近似值。</span>
-        <button type="button" class="ir-banner-close" aria-label="关闭横幅">
-            <iconify-icon icon="fluent:dismiss-20-regular"></iconify-icon>
-        </button>
-    </div>
-    <div class="ir-banner" id="ir-banner-cmyk" hidden>
-        <iconify-icon icon="fluent:warning-20-regular"></iconify-icon>
-        <span class="ir-banner-text">当前颜色超出 CMYK 印刷色域，CMYK 显示为近似值。</span>
-        <button type="button" class="ir-banner-close" aria-label="关闭横幅">
-            <iconify-icon icon="fluent:dismiss-20-regular"></iconify-icon>
-        </button>
+    </div><!-- /.iris-body -->
+
+    <!-- 色域提示：主内容下方的列表类横幅（超出显示，调回自动隐藏，无关闭按钮） -->
+    <div class="ir-banner-list">
+        <div class="ir-banner" id="ir-banner-p3" hidden>
+            <iconify-icon icon="fluent:warning-20-regular"></iconify-icon>
+            <span class="ir-banner-text">当前颜色位于 P3 广色域，超出 sRGB 可表达范围，RGBA / HEX / CMYK 显示为近似值。</span>
+        </div>
+        <div class="ir-banner" id="ir-banner-cmyk" hidden>
+            <iconify-icon icon="fluent:warning-20-regular"></iconify-icon>
+            <span class="ir-banner-text">当前颜色超出 CMYK 印刷色域，CMYK 显示为近似值。</span>
+        </div>
     </div>
 
 </main>

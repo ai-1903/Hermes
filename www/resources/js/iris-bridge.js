@@ -377,7 +377,8 @@
         state.r = rgb.r; state.g = rgb.g; state.b = rgb.b;
     }
 
-    /* ================= 底部横幅（色域提示） ================= */
+    /* ================= 色域提示横幅（主内容下方列表，动态显隐无关闭按钮） =================
+       超出显示 / 调回自动隐藏：showBanner / hideBanner 由各解析函数在每次更新时调用。 */
     function showBanner(kind) {
         var b = kind === 'cmyk' ? bannerCmyk : bannerP3;
         if (b) b.hidden = false;
@@ -386,8 +387,6 @@
         var b = kind === 'cmyk' ? bannerCmyk : bannerP3;
         if (b) b.hidden = true;
     }
-    if (bannerP3) bannerP3.querySelector('.ir-banner-close').addEventListener('click', function () { hideBanner('p3'); });
-    if (bannerCmyk) bannerCmyk.querySelector('.ir-banner-close').addEventListener('click', function () { hideBanner('cmyk'); });
 
     /* ================= 输入事件绑定 ================= */
     function bindCommit(inputs, parser) {
