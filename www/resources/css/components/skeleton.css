@@ -1,0 +1,111 @@
+/* ==========================================================================
+   skeleton.css — 流光骨架屏占位组件
+   类别：组件（加载占位：流光动画，用于先渲染空框架再渐显真实内容）
+   用法：容器加 .skeleton；占位形态用 .sk-line / .sk-block / .sk-circle
+   ========================================================================== */
+
+.skeleton {
+    position: relative;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 6px;
+}
+
+/* 流光扫描动画 */
+.skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.12),
+        transparent
+    );
+    animation: sk-shimmer 1.6s infinite;
+}
+
+@keyframes sk-shimmer {
+    100% { transform: translateX(100%); }
+}
+
+/* 文字条占位 */
+.sk-line {
+    height: 12px;
+    border-radius: 4px;
+}
+
+/* 方块 / 图片占位 */
+.sk-block {
+    border-radius: 10px;
+}
+
+/* 圆形占位（头像 / 图标） */
+.sk-circle {
+    border-radius: 50%;
+}
+
+/* 骨架屏容器：淡入 */
+.sk-wrap {
+    opacity: 0;
+    animation: sk-fade-in 0.3s forwards;
+}
+
+@keyframes sk-fade-in {
+    to { opacity: 1; }
+}
+
+/* 内容容器：数据就绪后渐显 */
+.fade-in {
+    opacity: 0;
+    animation: fade-in 0.5s ease forwards;
+}
+
+@keyframes fade-in {
+    to { opacity: 1; }
+}
+
+/* 骨架行：表格骨架 */
+.sk-table {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px;
+}
+
+.sk-table-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.sk-table-row .sk-line:first-child { width: 40%; }
+.sk-table-row .sk-line:last-child  { width: 14%; margin-left: auto; }
+
+/* 详情卡骨架 */
+.sk-detail {
+    display: flex;
+    gap: 12px;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+}
+
+.sk-detail .sk-circle {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+}
+
+.sk-detail .sk-lines {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sk-detail .sk-lines .sk-line:nth-child(1) { width: 55%; }
+.sk-detail .sk-lines .sk-line:nth-child(2) { width: 85%; }
+.sk-detail .sk-lines .sk-line:nth-child(3) { width: 65%; }

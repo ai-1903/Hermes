@@ -13,7 +13,7 @@ $footer = App::footer();
 $siteName    = App::config()['name'];
 $nav         = App::config()['nav'];
 $pageTitle   = 'Online Test — 在线检测';
-$pageStyles  = ['resources/css/search.css', 'resources/css/tools.css', 'resources/css/components/popover.css'];
+$pageStyles  = ['resources/css/search.css', 'resources/css/tools.css', 'resources/css/components/popover.css', 'resources/css/components/skeleton.css'];
 $pageScripts = [
     'resources/js/lib/network.js',
     'resources/js/components/popover.js',

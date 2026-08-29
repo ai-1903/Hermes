@@ -351,6 +351,69 @@
         });
     }
 
+    /* ---------- 骨架屏（先渲染空框架，数据就绪后渐显） ---------- */
+
+    /** 构建一个骨架元素（skeleton + 形态类） */
+    function skEl(shape, width) {
+        var el = document.createElement('div');
+        el.className = 'skeleton ' + (shape || 'sk-line');
+        if (width) el.style.width = width;
+        return el;
+    }
+
+    /** 表格骨架：模拟几行「目标 + 状态」 */
+    function renderTableSkeleton(rows) {
+        var wrap = document.createElement('div');
+        wrap.className = 'tool-table-wrap sk-wrap';
+        var box = document.createElement('div');
+        box.className = 'sk-table';
+        for (var i = 0; i < rows; i++) {
+            var r = document.createElement('div');
+            r.className = 'sk-table-row';
+            r.appendChild(skEl('sk-line'));
+            r.appendChild(skEl('sk-line'));
+            box.appendChild(r);
+        }
+        wrap.appendChild(box);
+        result.appendChild(wrap);
+    }
+
+    /** 详情卡骨架：圆图标 + 几行文字条 */
+    function renderDetailSkeleton(count) {
+        var wrap = document.createElement('div');
+        wrap.className = 'ot-details sk-wrap';
+        for (var i = 0; i < count; i++) {
+            var card = document.createElement('div');
+            card.className = 'sk-detail';
+            var circle = skEl('sk-circle');
+            var lines = document.createElement('div');
+            lines.className = 'sk-lines';
+            lines.appendChild(skEl('sk-line'));
+            lines.appendChild(skEl('sk-line'));
+            lines.appendChild(skEl('sk-line'));
+            card.appendChild(circle);
+            card.appendChild(lines);
+            wrap.appendChild(card);
+        }
+        result.appendChild(wrap);
+    }
+
+    /** 用渐显容器包裹并追加内容（骨架渐隐移除） */
+    function appendFadeIn(el) {
+        el.classList.add('fade-in');
+        result.appendChild(el);
+    }
+
+    /** 隐藏骨架屏（添加 .hidden 渐隐，随后移除） */
+    function hideSkeletons() {
+        var skels = result.querySelectorAll('.sk-wrap');
+        skels.forEach(function (sk) {
+            sk.style.transition = 'opacity 0.25s ease';
+            sk.style.opacity = '0';
+            setTimeout(function () { sk.remove(); }, 260);
+        });
+    }
+
     /**
      * 通配符查询（*.AB.XXX，可带端口 *.AB.XXX:8443）：
      * 逐个尝试常见子域，探测出一个即动态插入表格行，直到全部完成。
@@ -489,10 +552,11 @@
         });
 
         btn.disabled = true;
-        var loading = document.createElement('div');
-        loading.className = 'history-loading';
-        loading.textContent = '正在检测 ' + displayHosts.join('、') + ' …';
-        result.appendChild(loading);
+
+        // 先渲染流光骨架屏（表格 + 详情卡占位），数据就绪后再渐显真实内容
+        result.innerHTML = '';
+        renderTableSkeleton(hosts.length);
+        renderDetailSkeleton(hosts.length);
 
         Promise.all(hosts.map(function (h) {
             return N.detectStatus(currentProto, h, port).then(function (res) {
@@ -500,10 +564,21 @@
             });
         })).then(function (items) {
             btn.disabled = false;
+            // 骨架渐隐
+            hideSkeletons();
+            // 内容渐显
+            var tableWrap = document.createElement('div');
             renderTable(items);
+            var lastTable = result.lastElementChild;
+            if (lastTable && lastTable.classList.contains('tool-table-wrap')) {
+                lastTable.classList.add('fade-in');
+            }
             // 在线目标：抓取解析 IP / 归属地 / 站点名 / SEO / 图标
             Promise.all(items.map(fetchDetails)).then(function (details) {
                 renderDetails(details);
+                // 详情卡渐显
+                var detailsEl = result.querySelector('.ot-details');
+                if (detailsEl) detailsEl.classList.add('fade-in');
             });
             var t = now();
             if (isRoot && !port) {
