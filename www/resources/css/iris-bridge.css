@@ -252,6 +252,9 @@
     animation: ir-modal-fade 0.2s ease;
 }
 
+/* 作者 display:flex 覆盖了 [hidden] 的 UA 默认，需显式补回才能真正隐藏 */
+.ir-modal-overlay[hidden] { display: none; }
+
 @keyframes ir-modal-fade { from { opacity: 0; } to { opacity: 1; } }
 
 .ir-modal {

@@ -359,7 +359,17 @@
         modalText.textContent = text;
         modal.hidden = false;
     }
-    modalClose.addEventListener('click', function () { modal.hidden = true; });
+    function hideModal() {
+        modal.hidden = true;
+    }
+    modalClose.addEventListener('click', hideModal);
+    // 点击遮罩层 / Esc 也可关闭（真正的「有效隐藏」）
+    modal.addEventListener('click', function (e) {
+        if (e.target === modal) hideModal();   // 仅当点遮罩本身（非内部卡片）
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') hideModal();
+    });
 
     /* ================= 输入事件绑定 ================= */
     function bindCommit(inputs, parser) {
