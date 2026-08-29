@@ -39,7 +39,7 @@ return [
                             'label' => 'Online Test',
                             'href'  => 'online-test.php',
                             'desc'  => '域名 / IP 在线检测',
-                            'icon'  => 'fluent:wifi-3-20-regular',
+                            'icon'  => 'fluent:radio-tower-20-regular',
                         ],
                         [
                             'label' => 'Hawkeye',

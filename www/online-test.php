@@ -25,7 +25,7 @@ require __DIR__ . '/view/header.php';
 <main class="search-main">
     <div class="search-head">
         <h1 class="search-title">
-            <iconify-icon icon="fluent:wifi-3-20-regular"></iconify-icon>
+            <iconify-icon icon="fluent:radio-tower-20-regular"></iconify-icon>
             Online Test
         </h1>
         <p class="search-desc">输入域名或 IP 检测是否在线，支持 <code>域名/IP:端口</code> 与 <code>*.域名</code> 通配符。</p>
