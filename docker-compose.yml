@@ -1,0 +1,22 @@
+# Hermes — PHP + Nginx 开发环境
+# 对外暴露端口：9753
+services:
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: hermes-nginx
+    restart: unless-stopped
+    ports:
+      - "9753:80"
+    volumes:
+      - ./www:/var/www/html:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+    depends_on:
+      - php
+
+  php:
+    image: php:8.3-fpm-alpine
+    container_name: hermes-php
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./www:/var/www/html
