@@ -19,6 +19,9 @@
     var alphaCan   = document.getElementById('ir-alpha');
     var alphaCtx   = alphaCan.getContext('2d');
     var alphaThumb = document.getElementById('ir-alpha-thumb');
+    var valueCan   = document.getElementById('ir-value');
+    var valueCtx   = valueCan ? valueCan.getContext('2d') : null;
+    var valueThumb = document.getElementById('ir-value-thumb');
     var bannerP3   = document.getElementById('ir-banner-p3');
     var bannerCmyk = document.getElementById('ir-banner-cmyk');
 
@@ -173,6 +176,7 @@
         renderSwatches();
         renderPicker();
         renderAlpha();
+        renderValue();
     }
 
     function toHex(n) {
@@ -284,6 +288,22 @@
 
         // 滑块位置
         alphaThumb.style.left = (state.a * w) + 'px';
+    }
+
+    /* ---------- 明度条绘制（HSV V 值：黑 → 当前色相+饱和度的纯色） ---------- */
+    function renderValue() {
+        if (!valueCtx) return;
+        var w = valueCan.width, h = valueCan.height;
+        var grad = valueCtx.createLinearGradient(0, 0, w, 0);
+        var hsv = rgbToHsv(state.r, state.g, state.b);
+        // 保持当前色相 + 饱和度，明度从 0（黑）到 1（纯色）
+        grad.addColorStop(0, 'rgb(0,0,0)');
+        grad.addColorStop(1, 'rgb(' + hsvToRgb(hsv.h, hsv.s, 1).join(',') + ')');
+        valueCtx.fillStyle = grad;
+        valueCtx.fillRect(0, 0, w, h);
+
+        // 滑块位置
+        if (valueThumb) valueThumb.style.left = (hsv.v * w) + 'px';
     }
 
     /* ================= 输入解析（失焦更新） ================= */
@@ -410,16 +430,29 @@
         return clamp((e.clientX - r.left) / r.width, 0, 1);
     }
 
+    function valuePos(e) {
+        var r = valueCan.getBoundingClientRect();
+        return clamp((e.clientX - r.left) / r.width, 0, 1);
+    }
+
     function applyPicker(x, y) {
         var hue = x * 360;
         var sat = 1 - y;
-        var v = Math.max(state.r, state.g, state.b) / 255;
+        // 明度保持当前 V（由明度条控制）
+        var v = rgbToHsv(state.r, state.g, state.b).v;
         var rgb = hsvToRgb(hue, sat, v);
         state.r = rgb[0]; state.g = rgb[1]; state.b = rgb[2];
         renderAll();
     }
     function applyAlpha(a) {
         state.a = a;
+        renderAll();
+    }
+    function applyValue(v) {
+        // 保持当前色相 + 饱和度，仅调明度
+        var hsv = rgbToHsv(state.r, state.g, state.b);
+        var rgb = hsvToRgb(hsv.h, hsv.s, v);
+        state.r = rgb[0]; state.g = rgb[1]; state.b = rgb[2];
         renderAll();
     }
 
@@ -432,13 +465,19 @@
         dragging = 'alpha';
         applyAlpha(alphaPos(e));
     });
+    if (valueCan) valueCan.addEventListener('mousedown', function (e) {
+        dragging = 'value';
+        applyValue(valuePos(e));
+    });
     document.addEventListener('mousemove', function (e) {
         if (!dragging) return;
         if (dragging === 'picker') {
             var p = pickerPos(e);
             applyPicker(p.x, p.y);
-        } else {
+        } else if (dragging === 'alpha') {
             applyAlpha(alphaPos(e));
+        } else if (dragging === 'value') {
+            applyValue(valuePos(e));
         }
     });
     document.addEventListener('mouseup', function () { dragging = null; });

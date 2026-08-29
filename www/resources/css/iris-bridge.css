@@ -44,7 +44,8 @@
     cursor: pointer;
 }
 
-.ir-alpha-thumb {
+.ir-alpha-thumb,
+.ir-value-thumb {
     position: absolute;
     top: 50%;
     transform: translate(-50%, -50%);
@@ -55,6 +56,21 @@
     border: 2px solid rgba(148, 163, 184, 0.6);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
     pointer-events: none;
+}
+
+/* 明度条（透明度条下方，与透明度条一致样式） */
+.ir-value-track {
+    position: relative;
+    width: 280px;
+    height: 20px;
+}
+
+.ir-value-canvas {
+    width: 280px;
+    height: 20px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    cursor: pointer;
 }
 
 /* ---------- 右：输入框组 ---------- */

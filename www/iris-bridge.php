@@ -25,12 +25,16 @@ require __DIR__ . '/view/header.php';
 ?>
 <main class="iris-main">
 
-    <!-- 左：调色盘 + 透明度条 -->
+    <!-- 左：调色盘 + 透明度条 + 明度条 -->
     <section class="iris-picker">
         <canvas id="ir-picker" class="ir-picker-canvas" width="280" height="240"></canvas>
         <div class="ir-alpha-track">
             <canvas id="ir-alpha" class="ir-alpha-canvas" width="280" height="18"></canvas>
             <div id="ir-alpha-thumb" class="ir-alpha-thumb"></div>
+        </div>
+        <div class="ir-value-track">
+            <canvas id="ir-value" class="ir-value-canvas" width="280" height="18"></canvas>
+            <div id="ir-value-thumb" class="ir-value-thumb"></div>
         </div>
     </section>
 
