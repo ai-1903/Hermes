@@ -32,6 +32,42 @@
         return Network.isIPv4(s) || DOMAIN_RE.test(s);
     };
 
+    /** 端口正则（1-65535） */
+    var PORT_RE = /^:([0-9]{1,5})$/;
+
+    /**
+     * 解析目标输入：分离主机与端口（域名 / IP 后允许 :端口）。
+     * 仅屏蔽 / 这一字符；其余按常规域名 / IP 规则解析。
+     * @param {string} input 用户输入
+     * @returns {object|null} { host, port }；无效返回 null
+     */
+    Network.parseTarget = function (input) {
+        var s = String(input || '').trim();
+        if (!s || s.indexOf('/') !== -1 || /\s/.test(s)) return null;
+
+        var host = s;
+        var port = null;
+
+        // 提取 :端口（IPv4 / 域名均可；无端口则原样）
+        var m = s.match(/^(.*?)(:[0-9]{1,5})$/);
+        if (m) {
+            var p = parseInt(m[2].slice(1), 10);
+            if (p >= 1 && p <= 65535) {
+                host = m[1];
+                port = p;
+            }
+        }
+
+        if (!Network.isIPv4(host) && !DOMAIN_RE.test(host)) return null;
+        return { host: host, port: port };
+    };
+
+    /** 构造探测 URL：带端口时拼接，否则默认协议端口 */
+    Network.probeUrl = function (protocol, host, port) {
+        var base = protocol + '://' + host;
+        return port ? base + ':' + port : base;
+    };
+
     /** 是否根域名（恰好两段，如 AB.XXX） */
     Network.isRootDomain = function (input) {
         var s = String(input || '').trim().toLowerCase();
@@ -86,12 +122,12 @@
      * 注：no-cors 模式下 fetch 在「连接成功」时即 resolve（含 403/404），
      *     仅在 DNS 失败 / 连接拒绝 / 超时时 reject。
      */
-    Network.probe = function (protocol, host, timeoutMs) {
+    Network.probe = function (protocol, host, port, timeoutMs) {
         var timeout = timeoutMs || 6000;
         return new Promise(function (resolve) {
             var ctrl = new AbortController();
             var timer = setTimeout(function () { ctrl.abort(); }, timeout);
-            fetch(protocol + '://' + host, {
+            fetch(Network.probeUrl(protocol, host, port), {
                 method: 'GET',
                 mode: 'no-cors',
                 cache: 'no-store',
@@ -113,14 +149,14 @@
      *   内网 IP → local-online / local-offline
      *   其余 → online / offline
      */
-    Network.detectStatus = function (protocol, host) {
+    Network.detectStatus = function (protocol, host, port) {
         if (Network.isLoopback(host)) return Promise.resolve('loopback');
         if (Network.isPrivateIP(host)) {
-            return Network.probe(protocol, host).then(function (ok) {
+            return Network.probe(protocol, host, port).then(function (ok) {
                 return ok ? 'local-online' : 'local-offline';
             });
         }
-        return Network.probe(protocol, host).then(function (ok) {
+        return Network.probe(protocol, host, port).then(function (ok) {
             return ok ? 'online' : 'offline';
         });
     };

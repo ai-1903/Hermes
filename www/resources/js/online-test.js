@@ -118,38 +118,88 @@
         });
     }
 
-    /* ---------- 结果渲染（普通/根域） ---------- */
-    function renderResult(items) {
+    /* ---------- 结果渲染（普通/根域，表格） ---------- */
+    function renderTable(items) {
         result.innerHTML = '';
         if (!items.length) return;
-        var list = document.createElement('ul');
-        list.className = 'result-lines';
+
+        var wrap = document.createElement('div');
+        wrap.className = 'tool-table-wrap';
+
+        var table = document.createElement('table');
+        table.className = 'tool-table';
+
+        var thead = document.createElement('thead');
+        var trH = document.createElement('tr');
+        var thTarget = document.createElement('th');
+        thTarget.innerHTML = '<span class="th-inner"><iconify-icon icon="fluent:globe-20-regular"></iconify-icon> 目标</span>';
+        var thStatus = document.createElement('th');
+        thStatus.innerHTML = '<span class="th-inner"><iconify-icon icon="fluent:pulse-20-regular"></iconify-icon> 状态</span>';
+        trH.appendChild(thTarget);
+        trH.appendChild(thStatus);
+        thead.appendChild(trH);
+        table.appendChild(thead);
+
+        var tbody = document.createElement('tbody');
         items.forEach(function (it) {
-            var li = document.createElement('li');
-            var h = document.createElement('span');
-            h.className = 'host';
-            h.textContent = it.host;
+            var tr = document.createElement('tr');
+            var tdTarget = document.createElement('td');
+            tdTarget.className = 'mono';
+            tdTarget.textContent = it.target;
+            var tdStatus = document.createElement('td');
             var label = N.statusLabel(it.status);
             var s = document.createElement('span');
             s.className = 'st ' + label.cls;
             s.textContent = label.text;
-            li.appendChild(h);
-            li.appendChild(s);
-            list.appendChild(li);
+            tdStatus.appendChild(s);
+            tr.appendChild(tdTarget);
+            tr.appendChild(tdStatus);
+            tbody.appendChild(tr);
         });
-        result.appendChild(list);
+        table.appendChild(tbody);
+
+        wrap.appendChild(table);
+        result.appendChild(wrap);
     }
 
     /**
-     * 通配符查询（*.AB.XXX）：
-     * 逐个尝试常见子域，探测出一个即动态插入一条，直到全部完成。
+     * 通配符查询（*.AB.XXX，可带端口 *.AB.XXX:8443）：
+     * 逐个尝试常见子域，探测出一个即动态插入表格行，直到全部完成。
      */
     function runWildcard(wildHost) {
-        var root = N.wildcardRoot(wildHost);
+        // 分离通配符与端口：*.root:port
+        var port = null;
+        var w = wildHost;
+        var pm = wildHost.match(/^(.*?)(:[0-9]{1,5})$/);
+        if (pm) {
+            var pn = parseInt(pm[2].slice(1), 10);
+            if (pn >= 1 && pn <= 65535) {
+                port = pn;
+                w = pm[1];
+            }
+        }
+        var root = N.wildcardRoot(w);
         result.innerHTML = '';
-        var list = document.createElement('ul');
-        list.className = 'result-lines';
-        result.appendChild(list);
+
+        // 表格容器（动态插入行）
+        var wrap = document.createElement('div');
+        wrap.className = 'tool-table-wrap';
+        var table = document.createElement('table');
+        table.className = 'tool-table';
+        var thead = document.createElement('thead');
+        var trH = document.createElement('tr');
+        var thT = document.createElement('th');
+        thT.innerHTML = '<span class="th-inner"><iconify-icon icon="fluent:globe-20-regular"></iconify-icon> 子域</span>';
+        var thS = document.createElement('th');
+        thS.innerHTML = '<span class="th-inner"><iconify-icon icon="fluent:pulse-20-regular"></iconify-icon> 状态</span>';
+        trH.appendChild(thT);
+        trH.appendChild(thS);
+        thead.appendChild(trH);
+        table.appendChild(thead);
+        var tbody = document.createElement('tbody');
+        table.appendChild(tbody);
+        wrap.appendChild(table);
+        result.appendChild(wrap);
 
         var info = document.createElement('div');
         info.className = 'wild-loading';
@@ -162,23 +212,26 @@
         var hosts = N.SUBDOMAINS.map(function (s) { return s + '.' + root; });
         return hosts.reduce(function (chain, host) {
             return chain.then(function () {
-                return N.detectStatus(currentProto, host).then(function (status) {
+                return N.detectStatus(currentProto, host, port).then(function (status) {
                     if (status === 'online' || status === 'local-online') {
                         found++;
-                        var li = document.createElement('li');
-                        var h = document.createElement('span');
-                        h.className = 'host';
-                        h.textContent = host;
+                        // 动态插入一行
+                        var tr = document.createElement('tr');
+                        var tdTarget = document.createElement('td');
+                        tdTarget.className = 'mono';
+                        tdTarget.textContent = port ? host + ':' + port : host;
+                        var tdStatus = document.createElement('td');
                         var label = N.statusLabel(status);
                         var s = document.createElement('span');
                         s.className = 'st ' + label.cls;
                         s.textContent = label.text;
-                        li.appendChild(h);
-                        li.appendChild(s);
-                        list.appendChild(li);
+                        tdStatus.appendChild(s);
+                        tr.appendChild(tdTarget);
+                        tr.appendChild(tdStatus);
+                        tbody.appendChild(tr);
                         upsertHistory({
                             proto: currentProto,
-                            host: host,
+                            host: port ? host + ':' + port : host,
                             status: status,
                             time: t,
                         });
@@ -199,7 +252,7 @@
         result.innerHTML = '';
         if (!value) return;
 
-        // 通配符：*.AB.XXX
+        // 通配符：*.AB.XXX（可带端口）
         if (N.isWildcard(value)) {
             var w = value.toLowerCase();
             btn.disabled = true;
@@ -207,16 +260,19 @@
             return;
         }
 
-        if (!N.isValidHost(value)) {
+        var target = N.parseTarget(value);
+        if (!target) {
             var err = document.createElement('div');
             err.className = 'result-summary st-offline';
-            err.textContent = '输入无效：请输入域名或 IP 地址（禁止包含 /）';
+            err.textContent = '输入无效：请输入域名或 IP 地址（可带 :端口，禁止包含 /）';
             result.appendChild(err);
             return;
         }
+        var host = target.host;
+        var port = target.port;
 
         // 本地回环：直接显示，不探测
-        if (N.isIPv4(value) && N.isLoopback(value)) {
+        if (N.isIPv4(host) && N.isLoopback(host)) {
             var sum = document.createElement('div');
             sum.className = 'result-summary st-loopback';
             sum.textContent = '本地回环';
@@ -226,35 +282,40 @@
             return;
         }
 
-        var isRoot = N.isRootDomain(value);
-        var hosts = [value.toLowerCase()];
-        if (isRoot) {
-            // 根域名：同时测试 www. 与裸域，历史记录合并为一条「*.XXX.XX」
-            hosts = ['www.' + value.toLowerCase(), value.toLowerCase()];
+        var isRoot = N.isRootDomain(host);
+        // 根域名（无端口时）：同时测试 www. 与裸域
+        var hosts = [host];
+        if (isRoot && !port) {
+            hosts = ['www.' + host, host];
         }
+
+        // 展示目标（含端口）
+        var displayHosts = hosts.map(function (h) {
+            return port ? h + ':' + port : h;
+        });
 
         btn.disabled = true;
         var loading = document.createElement('div');
         loading.className = 'history-loading';
-        loading.textContent = '正在检测 ' + hosts.join('、') + ' …';
+        loading.textContent = '正在检测 ' + displayHosts.join('、') + ' …';
         result.appendChild(loading);
 
-        Promise.all(hosts.map(function (host) {
-            return N.detectStatus(currentProto, host).then(function (status) {
-                return { host: host, status: status };
+        Promise.all(hosts.map(function (h) {
+            return N.detectStatus(currentProto, h, port).then(function (status) {
+                return { target: port ? h + ':' + port : h, host: h, port: port, status: status };
             });
         })).then(function (items) {
             btn.disabled = false;
-            renderResult(items);
+            renderTable(items);
             var t = now();
-            if (isRoot) {
+            if (isRoot && !port) {
                 // 合并为一条：*.XXX.XX，状态取任一在线即「在线」
                 var anyOnline = items.some(function (it) {
                     return it.status === 'online' || it.status === 'local-online';
                 });
                 var merged = {
                     proto: currentProto,
-                    host: '*.' + value.toLowerCase(),
+                    host: '*.' + host,
                     status: anyOnline ? 'online' : 'offline',
                     time: t,
                 };
@@ -263,7 +324,7 @@
                 items.forEach(function (it) {
                     upsertHistory({
                         proto: currentProto,
-                        host: it.host,
+                        host: it.target,
                         status: it.status,
                         time: t,
                     });

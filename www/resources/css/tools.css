@@ -1,63 +1,10 @@
 /* ==========================================================================
-   tools.css — 网络工具页面共享样式（科幻风）
-   类别：页面（Online Test / Hawkeye / 天隼共用布局）
+   tools.css — 网络工具共享组件样式（科幻风）
+   类别：组件（协议选项卡、状态徽标、历史记录、数据表格）
+   Online Test / Hawkeye 共用；布局见 search.css
    ========================================================================== */
 
-.tool-main {
-    flex: 1;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 40px 24px;
-}
-
-.tool-card {
-    width: 100%;
-    max-width: 700px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
-    padding: 32px 36px;
-    box-shadow: var(--shadow-card);
-}
-
-.tool-title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 1.5rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    margin-bottom: 6px;
-}
-
-.tool-title iconify-icon { color: var(--accent); font-size: 1.3rem; }
-
-.tool-desc {
-    font-size: 0.88rem;
-    color: var(--text-secondary);
-    margin-bottom: 26px;
-}
-
-.tool-desc code {
-    font-family: var(--mono);
-    color: var(--accent);
-    background: rgba(34, 211, 238, 0.1);
-    padding: 1px 6px;
-    border-radius: 6px;
-    font-size: 0.82rem;
-}
-
-/* 输入行：协议选项卡 + 输入框 + 按钮 */
-.tool-input-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 22px;
-}
-
+/* ---------- 协议选项卡（搜索框内左侧） ---------- */
 .proto-tabs {
     display: flex;
     background: rgba(255, 255, 255, 0.06);
@@ -68,7 +15,7 @@
 }
 
 .proto-tab {
-    padding: 7px 16px;
+    padding: 6px 14px;
     background: transparent;
     border: none;
     border-radius: 8px;
@@ -85,54 +32,8 @@
     box-shadow: inset 0 0 10px rgba(34, 211, 238, 0.12);
 }
 
-.tool-input {
-    flex: 1;
-    min-width: 0;
-    padding: 11px 16px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    color: var(--text);
-    font-family: var(--mono);
-    font-size: 0.9rem;
-    outline: none;
-    transition: border-color 0.15s, box-shadow 0.15s;
-}
-
-.tool-input:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.15);
-}
-
-.tool-input::placeholder { color: var(--text-dim); }
-
-.tool-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 11px 24px;
-    background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-    color: #04121a;
-    font-weight: 700;
-    font-size: 0.92rem;
-    border: none;
-    border-radius: var(--radius-pill);
-    cursor: pointer;
-    flex-shrink: 0;
-    box-shadow: 0 0 14px rgba(34, 211, 238, 0.2);
-    transition: filter 0.2s, transform 0.05s, box-shadow 0.2s;
-}
-
-.tool-btn:hover {
-    filter: brightness(1.1);
-    box-shadow: 0 0 22px rgba(34, 211, 238, 0.35);
-}
-
-.tool-btn:active { transform: scale(0.97); }
-.tool-btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
-
-/* 检测结果 */
-.tool-result { margin-bottom: 22px; }
+/* ---------- 结果容器 ---------- */
+.tool-result { width: 100%; }
 
 .result-summary {
     display: inline-block;
@@ -143,32 +44,7 @@
     margin-bottom: 14px;
 }
 
-.result-lines {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.result-lines li {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 11px 16px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    font-size: 0.9rem;
-}
-
-.result-lines .host {
-    word-break: break-all;
-    font-family: var(--mono);
-    font-size: 0.85rem;
-}
-
-/* 状态徽标 */
+/* ---------- 状态徽标 ---------- */
 .st {
     display: inline-flex;
     align-items: center;
@@ -186,10 +62,79 @@
 .st-local-offline { color: var(--red);   background: rgba(248, 113, 113, 0.12); }
 .st-loopback      { color: var(--blue);  background: rgba(96, 165, 250, 0.12); }
 
-/* 历史记录 */
+/* ---------- 数据表格 ---------- */
+.tool-table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+}
+
+table.tool-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+}
+
+.tool-table thead th {
+    text-align: left;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    letter-spacing: 0.03em;
+}
+
+/* 表头图标：表头内容配图标，单元格文本仍左对齐 */
+.tool-table th .th-inner {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tool-table th iconify-icon { font-size: 14px; color: var(--accent); }
+
+.tool-table tbody td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    word-break: break-all;
+}
+
+.tool-table tbody tr:last-child td { border-bottom: none; }
+
+.tool-table tbody tr:hover td { background: rgba(34, 211, 238, 0.03); }
+
+.tool-table .mono {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+}
+
+/* 字段单元格（键名 + 图标） */
+.tool-table .field-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tool-table .field-cell iconify-icon { font-size: 14px; color: var(--accent); }
+
+.tool-table .ns-item {
+    display: inline-block;
+    margin: 2px 6px 2px 0;
+    padding: 2px 10px;
+    background: rgba(34, 211, 238, 0.1);
+    color: var(--accent);
+    border-radius: var(--radius-pill);
+    font-size: 0.78rem;
+}
+
+/* ---------- 历史记录（查询列表） ---------- */
 .history-wrap {
+    margin-top: 28px;
+    padding-top: 20px;
     border-top: 1px solid var(--border);
-    padding-top: 18px;
 }
 
 .history-title {
@@ -284,82 +229,15 @@
     padding: 8px 0;
 }
 
-/* 通配符结果（Online Test） */
+/* ---------- 提示消息 ---------- */
 .wild-loading {
     font-size: 0.85rem;
     color: var(--text-secondary);
     padding: 8px 0;
 }
 
-/* ---------- 数据表格（Hawkeye / 天隼） ---------- */
-.tool-table-wrap {
-    overflow-x: auto;
-    margin-top: 6px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-}
-
-table.tool-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.88rem;
-}
-
-.tool-table thead th {
-    text-align: left;
-    padding: 12px 16px;
-    background: rgba(255, 255, 255, 0.04);
-    border-bottom: 1px solid var(--border);
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: var(--text-dim);
-    letter-spacing: 0.03em;
-}
-
-/* 表头图标：表头内容配图标，单元格文本仍左对齐 */
-.tool-table th .th-inner {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.tool-table th iconify-icon { font-size: 14px; color: var(--accent); }
-
-.tool-table tbody td {
-    padding: 11px 16px;
-    border-bottom: 1px solid var(--border);
-    vertical-align: top;
-    word-break: break-all;
-}
-
-.tool-table tbody tr:last-child td { border-bottom: none; }
-
-.tool-table tbody tr:hover td { background: rgba(34, 211, 238, 0.03); }
-
-.tool-table .k { color: var(--text-dim); white-space: nowrap; }
-
-/* 字段单元格（键名 + 图标） */
-.tool-table .field-cell {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.tool-table .field-cell iconify-icon { font-size: 14px; color: var(--accent); }
-
-.tool-table .ns-item {
-    display: inline-block;
-    margin: 2px 6px 2px 0;
-    padding: 2px 10px;
-    background: rgba(34, 211, 238, 0.1);
-    color: var(--accent);
-    border-radius: var(--radius-pill);
-    font-size: 0.78rem;
-}
-
-/* 移动端适配 */
-@media (max-width: 620px) {
-    .tool-card { padding: 24px 20px; }
-    .tool-input-row { flex-wrap: wrap; }
-    .tool-input { min-width: 100%; }
+.whois-empty {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    padding: 8px 0;
 }
