@@ -1,0 +1,212 @@
+{
+  "comment": "运营商通识名称识别字典。keys：匹配关键词（大小写不敏感，可包含 AS 号、域名片段、常见缩写）；values：{ name: 通识名称, region: 泛地区 }. 匹配优先级：精确匹配 > 关键词包含匹配 > 默认兜底（原始 org 信息）。",
+  "version": 1,
+  "categories": [
+    {
+      "name": "中国（大陆）",
+      "region": "中国大陆",
+      "entries": [
+        { "keys": ["中国移动", "china mobile", "chinamobile", "cmcc", "CHINA MOBILE"], "name": "中国移动" },
+        { "keys": ["中国联通", "china unicom", "chinaunicom", "cucc", "unicom"], "name": "中国联通" },
+        { "keys": ["中国电信", "china telecom", "chinatelecom", "ctcc", "chinanet"], "name": "中国电信" },
+        { "keys": ["中国广电", "china broadcast", "chinabroadcast", "cbnet", "china broadband"], "name": "中国广电" },
+        { "keys": ["铁通", "crtc", "tietong"], "name": "中国铁通" },
+        { "keys": ["中国教育网", "cernet", "china education"], "name": "中国教育和科研计算机网 (CERNET)" },
+        { "keys": ["鹏博士", "dr.peng", "drpeng"], "name": "鹏博士" },
+        { "keys": ["长城宽带", "greatwall broadband", "gwbn"], "name": "长城宽带" },
+        { "keys": ["方正宽带", "founder broadband"], "name": "方正宽带" }
+      ]
+    },
+    {
+      "name": "中国（港澳台）",
+      "region": "中国香港 / 澳门 / 台湾",
+      "entries": [
+        { "keys": ["中国移动香港", "china mobile hong kong", "cmhk"], "name": "中国移动香港" },
+        { "keys": ["香港移动通讯", "csl", "hong kong mobile", "hkcsl"], "name": "香港移动通讯 (csl)" },
+        { "keys": ["和记电讯", "hutchison", "3hk", "three hong kong"], "name": "和记电讯 (3 香港)" },
+        { "keys": ["香港电讯", "hkt", "pccw", "netvigator"], "name": "香港电讯 (HKT)" },
+        { "keys": ["数码通", "smartone", "smartone-vodafone"], "name": "数码通 (SmarTone)" },
+        { "keys": ["中国电信国际", "china telecom global", "ctg"], "name": "中国电信国际" },
+        { "keys": ["澳门电讯", "ctm", "macau telecom"], "name": "澳门电讯 (CTM)" },
+        { "keys": ["中华电信", "chunghwa telecom", "cht"], "name": "中华电信 (HiNet)" },
+        { "keys": ["台湾大哥大", "taiwan mobile", "twmobile"], "name": "台湾大哥大" },
+        { "keys": ["远传电信", "fareastone", "fetnet"], "name": "远传电信 (FET)" },
+        { "keys": ["亚太电信", "aptg", "asia pacific telecom"], "name": "亚太电信 (Asia Pacific)" }
+      ]
+    },
+    {
+      "name": "美国 / 北美",
+      "region": "美国 / 北美",
+      "entries": [
+        { "keys": ["comcast", "xfinity"], "name": "Comcast Xfinity" },
+        { "keys": ["at&t", "att", "sbc internet"], "name": "AT&T" },
+        { "keys": ["verizon", "verizon fios"], "name": "Verizon" },
+        { "keys": ["t-mobile", "tmobile", "sprint"], "name": "T-Mobile" },
+        { "keys": ["spectrum", "charter communications"], "name": "Spectrum (Charter)" },
+        { "keys": ["centurylink", "lumen technologies"], "name": "Lumen / CenturyLink" },
+        { "keys": ["frontier communications"], "name": "Frontier" },
+        { "keys": ["cogent communications", "cogentco"], "name": "Cogent Communications" },
+        { "keys": ["crown castle", "lighternet"], "name": "LighterNet" },
+        { "keys": ["zetta"], "name": "Zetta" },
+        { "keys": ["time warner cable", "twc", "road runner"], "name": "Spectrum (TW 前身)" },
+        { "keys": ["optimum", "altice"], "name": "Optimum (Altice)" },
+        { "keys": ["cox communications"], "name": "Cox" },
+        { "keys": ["windstream"], "name": "Windstream" },
+        { "keys": ["telia", "telia carrier"], "name": "Telia" },
+        { "keys": ["bell canada", "bell aliant"], "name": "Bell Canada" },
+        { "keys": ["rogers communications"], "name": "Rogers" },
+        { "keys": ["shaw communications"], "name": "Shaw" },
+        { "keys": ["telus"], "name": "Telus" }
+      ]
+    },
+    {
+      "name": "欧洲",
+      "region": "欧洲",
+      "entries": [
+        { "keys": ["deutsche telekom", "deutsche telecom", "t-online"], "name": "Deutsche Telekom" },
+        { "keys": ["vodafone"], "name": "Vodafone" },
+        { "keys": ["o2", "telefonica"], "name": "O2 (Telefónica)" },
+        { "keys": ["orange s.a", "orange france", "orange telecom"], "name": "Orange" },
+        { "keys": ["free mobile", "free sas", "free.fr"], "name": "Free (Free Mobile)" },
+        { "keys": ["bouygues telecom"], "name": "Bouygues Telecom" },
+        { "keys": ["sfr"], "name": "SFR" },
+        { "keys": ["bt group", "british telecom", "bt plc"], "name": "BT" },
+        { "keys": ["sky uk", "sky broadband"], "name": "Sky UK" },
+        { "keys": ["virgin media"], "name": "Virgin Media" },
+        { "keys": ["ee limited", "everything everywhere"], "name": "EE" },
+        { "keys": ["three uk", "hutchison 3g uk"], "name": "Three UK" },
+        { "keys": ["telekom italia", "tim italia", "telecom italia"], "name": "TIM" },
+        { "keys": ["wind tre", "wind telecom", "3 italia"], "name": "WINDTRE" },
+        { "keys": ["vodafone italia"], "name": "Vodafone Italia" },
+        { "keys": ["telefonica espana", "movistar"], "name": "Movistar (Telefónica)" },
+        { "keys": ["orange espagne", "jazz telecom"], "name": "Orange España" },
+        { "keys": ["kpn"], "name": "KPN" },
+        { "keys": ["ziggo", "vodafone ziggo"], "name": "VodafoneZiggo" },
+        { "keys": ["proximus"], "name": "Proximus" },
+        { "keys": ["telenor"], "name": "Telenor" },
+        { "keys": ["telia company", "telia finland"], "name": "Telia" },
+        { "keys": ["swisscom"], "name": "Swisscom" },
+        { "keys": ["telenet"], "name": "Telenet" },
+        { "keys": ["neuf cegetel"], "name": "SFR (Neuf)" },
+        { "keys": ["liberty global", "unitymedia"], "name": "Vodafone (Unitymedia)" },
+        { "keys": ["tiscali"], "name": "Tiscali" },
+        { "keys": ["tele2"], "name": "Tele2" },
+        { "keys": ["eir"], "name": "Eir" }
+      ]
+    },
+    {
+      "name": "日本",
+      "region": "日本",
+      "entries": [
+        { "keys": ["ntt docomo", "docomo"], "name": "NTT Docomo" },
+        { "keys": ["ntt communications", "ntt com"], "name": "NTT Communications" },
+        { "keys": ["au by kddi", "kddi"], "name": "au (KDDI)" },
+        { "keys": ["softbank", "softbank bb"], "name": "SoftBank" },
+        { "keys": ["rakuten mobile", "rakuten communications"], "name": "Rakuten Mobile" },
+        { "keys": ["bbix", "bb exchange"], "name": "BBIX" },
+        { "keys": ["ii jigoku", "iij"], "name": "Internet Initiative Japan (IIJ)" },
+        { "keys": ["jcom", "jupiter telecom"], "name": "J:COM" },
+        { "keys": ["flet's", "nifty"], "name": "NTT (FLET'S)" }
+      ]
+    },
+    {
+      "name": "韩国",
+      "region": "韩国",
+      "entries": [
+        { "keys": ["kt corp", "korea telecom", "kt"], "name": "KT" },
+        { "keys": ["sk telecom", "sk broadband", "skb"], "name": "SK Telecom" },
+        { "keys": ["lg u+", "lg uplus", "lg telecom"], "name": "LG U+" },
+        { "keys": ["korea internet", "kix"], "name": "Korea Internet (KIX)" },
+        { "keys": ["hanaro telecom"], "name": "SK Broadband (Hanaro)" }
+      ]
+    },
+    {
+      "name": "东南亚",
+      "region": "东南亚",
+      "entries": [
+        { "keys": ["singtel", "singapore telecom"], "name": "Singtel" },
+        { "keys": ["starhub"], "name": "StarHub" },
+        { "keys": ["m1 limited", "m1 singapore"], "name": "M1" },
+        { "keys": ["telekom malaysia", "tm net"], "name": "TM (Telekom Malaysia)" },
+        { "keys": ["maxis"], "name": "Maxis" },
+        { "keys": ["digi", "digi telecom"], "name": "CelcomDigi" },
+        { "keys": ["celcom", "celcom axiata"], "name": "Celcom (Axiata)" },
+        { "keys": ["true corporation", "true internet"], "name": "True" },
+        { "keys": ["ais", "advanced info service"], "name": "AIS" },
+        { "keys": ["dtac", "total access"], "name": "dtac" },
+        { "keys": ["telkom indonesia", "telkomnet", "telkomsel"], "name": "Telkom Indonesia" },
+        { "keys": ["indihome"], "name": "IndiHome" },
+        { "keys": ["philippine long distance", "pldt"], "name": "PLDT" },
+        { "keys": ["globe telecom"], "name": "Globe Telecom" },
+        { "keys": ["viettel"], "name": "Viettel" },
+        { "keys": ["vnpt", "vietnam posts"], "name": "VNPT" },
+        { "keys": ["fpt telecom"], "name": "FPT Telecom" }
+      ]
+    },
+    {
+      "name": "数据中心 / 云服务商",
+      "region": "全球 / 数据中心",
+      "entries": [
+        { "keys": ["amazon", "aws", "amazon technologies"], "name": "Amazon Web Services (AWS)" },
+        { "keys": ["microsoft", "azure", "microsoft azure"], "name": "Microsoft Azure" },
+        { "keys": ["google", "google llc", "google cloud", "gcp"], "name": "Google Cloud" },
+        { "keys": ["oracle", "oracle cloud"], "name": "Oracle Cloud" },
+        { "keys": ["digitalocean"], "name": "DigitalOcean" },
+        { "keys": ["linode", "akamai linode"], "name": "Akamai Linode" },
+        { "keys": ["vultr", "the constant company"], "name": "Vultr" },
+        { "keys": ["hetzner"], "name": "Hetzner" },
+        { "keys": ["ovh"], "name": "OVHcloud" },
+        { "keys": ["scaleway"], "name": "Scaleway" },
+        { "keys": ["cloudflare"], "name": "Cloudflare" },
+        { "keys": ["akamai"], "name": "Akamai" },
+        { "keys": ["fastly"], "name": "Fastly" },
+        { "keys": ["alibaba cloud", "alicloud"], "name": "阿里云 (Alibaba Cloud)" },
+        { "keys": ["tencent cloud", "tencent comput"], "name": "腾讯云 (Tencent Cloud)" },
+        { "keys": ["huawei cloud", "huawei public cloud"], "name": "华为云 (Huawei Cloud)" },
+        { "keys": ["baidu cloud", "baidu netcom"], "name": "百度智能云" },
+        { "keys": ["upyun"], "name": "又拍云 (UPYUN)" },
+        { "keys": ["qiniu"], "name": "七牛云 (Qiniu)" },
+        { "keys": ["leaseweb"], "name": "Leaseweb" },
+        { "keys": ["contabo"], "name": "Contabo" },
+        { "keys": ["rackspace"], "name": "Rackspace" },
+        { "keys": ["ibm cloud", "softlayer"], "name": "IBM Cloud" },
+        { "keys": ["coresite"], "name": "CoreSite" },
+        { "keys": ["equinix"], "name": "Equinix" },
+        { "keys": ["m247"], "name": "M247" },
+        { "keys": ["g-core", "gcore"], "name": "G-Core" },
+        { "keys": ["cogent"], "name": "Cogent Communications" },
+        { "keys": ["neterra"], "name": "Neterra" },
+        { "keys": ["mts allstream"], "name": "MTS Allstream" },
+        { "keys": ["netcup"], "name": "Netcup" }
+      ]
+    },
+    {
+      "name": "大洋洲",
+      "region": "大洋洲",
+      "entries": [
+        { "keys": ["telstra"], "name": "Telstra" },
+        { "keys": ["optus", "singtel optus"], "name": "Optus" },
+        { "keys": ["tpg telecom", "tpg internet"], "name": "TPG" },
+        { "keys": ["vodafone australia"], "name": "Vodafone Australia" },
+        { "keys": ["aussie broadband"], "name": "Aussie Broadband" },
+        { "keys": ["spark nz", "telecom new zealand"], "name": "Spark NZ" }
+      ]
+    },
+    {
+      "name": "印度 / 中东 / 其他",
+      "region": "印度 / 中东 / 其他",
+      "entries": [
+        { "keys": ["reliance jio", "jio"], "name": "Jio" },
+        { "keys": ["airtel", "bharti airtel"], "name": "Airtel" },
+        { "keys": ["vodafone idea", "vi india"], "name": "Vi (Vodafone Idea)" },
+        { "keys": ["bsnl"], "name": "BSNL" },
+        { "keys": ["stc", "saudi telecom"], "name": "STC" },
+        { "keys": ["etisalat", "du telecom"], "name": "Etisalat" },
+        { "keys": ["du", "emirates integrated"], "name": "du (EITC)" },
+        { "keys": ["zain"], "name": "Zain" },
+        { "keys": ["mtn"], "name": "MTN" },
+        { "keys": ["safaricom"], "name": "Safaricom" }
+      ]
+    }
+  ]
+}

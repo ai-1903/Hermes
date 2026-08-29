@@ -4,18 +4,21 @@
  * 职责：
  *   1. 打开页面自动获取公网 IP（多数据源依次兜底）
  *   2. 展示巨大 IP + 服务商信息 + 标签（服务商通识名称 / 网络环境 / 泛地区）
- *   3. localStorage 记录近期此设备出站用过的 IP：上次使用时间 + 打开天隼次数
+ *   3. 运营商通识名称识别：加载 data/json/isp-dict.json 字典，
+ *      按「精确匹配 → 关键词包含匹配 → 默认兜底」识别
+ *   4. localStorage 记录近期此设备出站用过的 IP：上次使用时间 + 打开天隼次数
  */
 (function () {
     'use strict';
 
-    var ipEl     = document.getElementById('fc-ip');
-    var ispEl    = document.getElementById('fc-isp');
-    var tagsEl   = document.getElementById('fc-tags');
+    var ipEl      = document.getElementById('fc-ip');
+    var ispEl     = document.getElementById('fc-isp');
+    var tagsEl    = document.getElementById('fc-tags');
     var historyEl = document.getElementById('fc-history');
 
     var HISTORY_KEY = 'hermes_falcon_ip_history';
     var HISTORY_MAX = 20;
+    var DICT_URL    = 'data/json/isp-dict.json';
 
     /* ---------- 数据源（依次兜底） ---------- */
     var PROVIDERS = [
@@ -61,10 +64,75 @@
         }, Promise.reject());
     }
 
-    /* ---------- 服务商通识名称（剥离 ASN 前缀） ---------- */
-    function cleanOrg(org) {
-        if (!org) return '';
-        return String(org).replace(/^AS\d+\s*/i, '').trim();
+    /* ---------- 运营商通识名称识别字典 ---------- */
+    var dictCache = null;
+
+    /** 加载字典（data/json/isp-dict.json），失败返回 null（不影响主流程） */
+    function loadDict() {
+        if (dictCache) return Promise.resolve(dictCache);
+        return fetch(DICT_URL, { cache: 'no-store' })
+            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+            .then(function (d) {
+                dictCache = d;
+                return d;
+            })
+            .catch(function () { return null; });
+    }
+
+    /** 归一化：小写 + 折叠空白（中文关键词也适用） */
+    function norm(s) {
+        return String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
+    }
+
+    /**
+     * 从字典识别运营商通识名称。
+     * @param {string} org 原始 org 字符串（如 "AS9808 China Mobile Communications Corporation"）
+     * @param {object} dict 字典对象（可能为 null）
+     * @returns {string|null} 通识名称；识别不到返回 null（由调用方兜底显示原始信息）
+     *
+     * 匹配策略（保证最具体者优先，避免短关键词误伤）：
+     *   1. 精确匹配：整段归一化后与关键词完全相等
+     *   2. 关键词包含匹配：按关键词长度降序（更具体的关键词优先匹配，
+     *      如 "china mobile hong kong" 优先于 "china mobile"）
+     */
+    function lookupISP(org, dict) {
+        if (!dict || !org) return null;
+        var n = norm(org);
+
+        // 展平所有 (关键词, 通识名) 对
+        var pairs = [];
+        var categories = dict.categories || [];
+        for (var i = 0; i < categories.length; i++) {
+            var entries = categories[i].entries || [];
+            for (var j = 0; j < entries.length; j++) {
+                var keys = entries[j].keys || [];
+                for (var k = 0; k < keys.length; k++) {
+                    var kn = norm(keys[k]);
+                    if (kn) pairs.push({ kn: kn, name: entries[j].name });
+                }
+            }
+        }
+
+        // 1) 精确匹配
+        for (var a = 0; a < pairs.length; a++) {
+            if (n === pairs[a].kn) return pairs[a].name;
+        }
+
+        // 2) 关键词包含匹配：长度降序，更具体者优先
+        pairs.sort(function (x, y) { return y.kn.length - x.kn.length; });
+        for (var b = 0; b < pairs.length; b++) {
+            if (n.indexOf(pairs[b].kn) !== -1) return pairs[b].name;
+        }
+
+        return null;
+    }
+
+    /** 服务商通识名称（优先字典，找不到则剥离 ASN 前缀返回原始信息） */
+    function ispName(org, dict) {
+        var known = lookupISP(org, dict);
+        if (known) return known;
+        // 默认兜底：剥离 ASN 前缀
+        return String(org || '').replace(/^AS\d+\s*/i, '').trim();
     }
 
     /* ---------- 网络环境判定（托管关键字启发式） ---------- */
@@ -95,14 +163,14 @@
         container.appendChild(tag);
     }
 
-    function renderHero(info) {
+    function renderHero(info, dict) {
         ipEl.classList.remove('loading');
         ipEl.textContent = info.ip || '—';
         ispEl.textContent = info.org || '';
         tagsEl.innerHTML = '';
 
-        // 服务商通识名称
-        var org = cleanOrg(info.org);
+        // 服务商通识名称（字典识别，默认兜底原始信息）
+        var org = ispName(info.org, dict);
         addTag(tagsEl, '服务商', org, 'fluent:building-bank-20-regular');
 
         // 网络环境（代理 / 托管判定）
@@ -201,12 +269,15 @@
         });
     }
 
-    /* ---------- 初始化（自动获取） ---------- */
+    /* ---------- 初始化（自动获取 + 字典识别） ---------- */
     function init() {
         renderHistory();
 
-        query().then(function (info) {
-            renderHero(info);
+        // 并行：加载字典 + 获取 IP
+        Promise.all([loadDict(), query()]).then(function (res) {
+            var dict = res[0];
+            var info = res[1];
+            renderHero(info, dict);
             upsertHistory(info.ip || '—');
             renderHistory();
         }).catch(function () {
