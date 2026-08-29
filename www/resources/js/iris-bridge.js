@@ -530,18 +530,12 @@
         ta.remove();
     }
 
-    /* ================= 复制按钮展开（本体伸展） =================
-       桌面：悬停（CSS :hover）时按钮本体向右伸展为两个胶囊；
-       移动端：点击按钮切换 .open 展开，两个胶囊横排到输入框底部。 */
-    function isMobile() {
-        return window.innerWidth <= 820;
-    }
-
+    /* ================= 复制按钮 =================
+       桌面：悬停（CSS :hover）时按钮右侧滑出两个胶囊，分别选择复制；
+       移动端：胶囊常显直接显示，点击胶囊复制对应格式（无复制图标）。 */
     // 初始化每个复制按钮组
     Object.keys(copyStates).forEach(function (fmt) {
         var row = document.querySelector('.ir-row[data-format="' + fmt + '"]');
-        var copy = row.querySelector('.ir-copy');
-        var btn = row.querySelector('.ir-copy-btn');
         var opts = row.querySelectorAll('.ir-copy-opt');
 
         function markActive() {
@@ -551,16 +545,7 @@
         }
         markActive();
 
-        // 移动端：点击按钮切换展开
-        if (btn) {
-            btn.addEventListener('click', function (e) {
-                if (!isMobile()) return;   // 桌面交给 CSS hover
-                e.stopPropagation();
-                copy.classList.toggle('open');
-            });
-        }
-
-        // 点击选项：复制（桌面展开态 / 移动端展开态下）
+        // 点击胶囊选项：复制对应格式（桌面 / 移动端通用）
         opts.forEach(function (o) {
             o.addEventListener('click', function (e) {
                 e.stopPropagation();
@@ -569,8 +554,6 @@
                 copyText(COPY_FN[fmt](o.dataset.mode));
                 o.classList.add('copied');
                 setTimeout(function () { o.classList.remove('copied'); }, 1200);
-                // 移动端复制后收起
-                if (isMobile()) copy.classList.remove('open');
             });
         });
     });

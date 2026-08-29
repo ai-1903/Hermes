@@ -175,79 +175,105 @@
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
-/* 复制按钮（圆形本体，悬停/点击时向右伸展为两个胶囊） */
+/* 复制按钮（圆形本体；桌面悬停时向右滑出两个胶囊，绝对定位不推挤主内容） */
 .ir-copy {
     position: relative;
     flex-shrink: 0;
+    width: 30px;
+    height: 30px;
 }
 
-/* 按钮本体：默认圆形图标，悬停伸展为胶囊（内含图标 + 两个选项） */
+/* 按钮本体：固定 30px 圆形图标（不因展开改变尺寸 → 不推挤行内其它元素） */
 .ir-copy-btn {
     display: flex;
     align-items: center;
+    justify-content: center;
     width: 30px;
     height: 30px;
     padding: 0;
-    border-radius: 15px;             /* 圆形 */
+    border-radius: 50%;
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid var(--border);
     color: var(--text-secondary);
     cursor: pointer;
-    overflow: hidden;                /* 选项默认折叠在按钮内 */
-    transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1), border-radius 0.22s,
-                border-color 0.15s, color 0.15s, background 0.15s, box-shadow 0.15s;
+    transition: border-color 0.15s, color 0.15s, background 0.15s, box-shadow 0.15s;
 }
 
-.ir-copy-btn iconify-icon {
-    flex-shrink: 0;
-    width: 30px;
-    font-size: 1rem;
-    display: inline-flex;
-    justify-content: center;
-}
+.ir-copy-btn iconify-icon { font-size: 1rem; }
 
-/* 两个胶囊选项（默认在按钮内折叠，宽度 0） */
-.ir-copy-opt {
-    flex-shrink: 0;
-    max-width: 0;
-    padding: 0;
-    overflow: hidden;
+/* 胶囊菜单：绝对定位到按钮右侧（视觉上按钮向右伸展），不占布局、不推挤内容 */
+.ir-copy-menu {
+    position: absolute;
+    top: 0;
+    left: 100%;
+    display: flex;
+    align-items: center;
+    height: 30px;
     white-space: nowrap;
-    background: transparent;
-    border: none;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.18s, visibility 0.18s;
+}
+
+/* 两个胶囊选项：相邻贴合，视觉上与按钮连成一体 */
+.ir-copy-opt {
+    display: flex;
+    align-items: center;
+    height: 30px;
+    padding: 0 12px;
+    background: var(--surface-solid);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
     color: var(--accent);
     font-size: 0.76rem;
     font-weight: 600;
     font-family: inherit;
+    white-space: nowrap;
     cursor: pointer;
-    transition: max-width 0.22s cubic-bezier(0.4, 0, 0.2, 1), padding 0.22s, color 0.15s;
+    transition: color 0.15s, background 0.15s;
 }
 
-/* 桌面：悬停按钮本体向右伸展为胶囊 */
+/* 第一个胶囊：左侧无圆角贴合按钮，右侧圆角贴合第二个 */
+.ir-copy-opt:first-of-type {
+    border-left: 1px solid var(--border);
+    border-radius: 15px 0 0 15px;
+}
+
+/* 第二个胶囊：右侧圆角 */
+.ir-copy-opt:last-of-type {
+    border-right: 1px solid var(--border);
+    border-radius: 0 15px 15px 0;
+}
+
+.ir-copy-opt:hover { color: #a5f3fc; background: rgba(255, 255, 255, 0.06); }
+
+.ir-copy-opt.active { background: rgba(34, 211, 238, 0.14); }
+
+.ir-copy-opt.copied { color: var(--green); background: rgba(52, 211, 153, 0.16); }
+
+/* 桌面：悬停 / 聚焦时胶囊从按钮右侧滑出 */
+.ir-copy:hover .ir-copy-menu,
+.ir-copy:focus-within .ir-copy-menu {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
 .ir-copy-btn:hover,
-.ir-copy-btn:focus-visible,
-.ir-copy-btn.open {
-    border-radius: 15px;
+.ir-copy-btn:focus-visible {
     border-color: rgba(34, 211, 238, 0.4);
     color: var(--accent);
     background: rgba(34, 211, 238, 0.08);
     box-shadow: 0 0 12px rgba(34, 211, 238, 0.18);
 }
 
-.ir-copy-btn:hover .ir-copy-opt,
-.ir-copy-btn:focus-visible .ir-copy-opt,
-.ir-copy-btn.open .ir-copy-opt {
-    max-width: 120px;
-    padding: 6px 10px;
+/* 按钮本体「已复制」闪烁（移动端点图标时） */
+.ir-copy-btn.copied {
+    color: var(--green);
+    border-color: rgba(52, 211, 153, 0.4);
+    background: rgba(52, 211, 153, 0.12);
 }
-
-.ir-copy-opt:first-of-type { border-left: 1px solid rgba(34, 211, 238, 0.25); }
-
-.ir-copy-opt:hover { color: #a5f3fc; }
-
-.ir-copy-opt.active { background: rgba(34, 211, 238, 0.14); }
-
-.ir-copy-opt.copied { color: var(--green); background: rgba(52, 211, 153, 0.16); }
 
 /* ---------- 色域提示：主内容下方的列表类横幅（动态显隐，无关闭按钮） ---------- */
 .ir-banner-list {
@@ -294,7 +320,7 @@
     line-height: 1.5;
 }
 
-/* ---------- 移动端：纵向排列；复制胶囊横到输入框底部 ---------- */
+/* ---------- 移动端：纵向排列；复制胶囊直接显示，与输入框组两侧对齐 ---------- */
 @media (max-width: 820px) {
     .iris-main { gap: 32px; padding: 36px 18px 56px; }
     .iris-body { flex-direction: column; gap: 36px; }
@@ -302,36 +328,57 @@
     .ir-label { width: 44px; }
     .ir-banner-list { max-width: 100%; }
 
-    /* 复制按钮：整个横到对应数值底部（输入框同宽），两个胶囊各占一半 */
+    /* 复制按钮：换行到输入框组下方，宽度与输入框组一致、左缘对齐输入框组
+       （label + gap 后 → margin-left = 44 + 10；宽 224 = 输入框组宽） */
     .ir-row {
         flex-wrap: wrap;
         gap: 8px 10px;
     }
     .ir-copy {
         order: 5;
-        width: calc(44px + 10px + 224px);   /* label + gap + 输入框宽，左对齐输入框 */
-        margin-left: 0;
+        width: 224px;                    /* 与输入框组同宽 */
+        margin-left: calc(44px + 10px);  /* label + gap，对齐输入框组左缘 */
     }
+
+    /* 移动端不需要复制图标：隐藏 */
+    .ir-copy-btn iconify-icon { display: none; }
+
+    /* 按钮本体撑满：内部只含胶囊菜单（两个胶囊均分） */
     .ir-copy-btn {
         width: 100%;
-        border-radius: 15px;
+        height: 32px;
+        border-radius: 16px;
+        justify-content: flex-start;
+        border-color: transparent;       /* 移动端按钮本身不显示边框，由胶囊呈现 */
+        background: transparent;
     }
-    .ir-copy-btn iconify-icon {
-        width: 34px;
-    }
-    /* 默认收起：仅显示图标 */
-    .ir-copy-btn:not(.open) .ir-copy-opt {
-        max-width: 0;
-        padding: 0;
-    }
-    /* 展开：两个胶囊均分，与输入框同宽 */
-    .ir-copy-btn.open {
+
+    /* 胶囊菜单：移动端转为静态流内、常显（无需悬停） */
+    .ir-copy-menu {
+        position: static;
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
         width: 100%;
+        height: 32px;
     }
-    .ir-copy-btn.open .ir-copy-opt {
-        max-width: 200px;
+
+    /* 两个胶囊均分占满，居中文本 */
+    .ir-copy-opt {
         flex: 1;
-        padding: 6px 4px;
+        height: 32px;
+        padding: 0 4px;
+        justify-content: center;
         text-align: center;
+        border-radius: 16px;             /* 整体胶囊 */
+        background: rgba(34, 211, 238, 0.08);
+    }
+    .ir-copy-opt:first-of-type {
+        border-left: 1px solid rgba(34, 211, 238, 0.3);
+        border-radius: 16px 0 0 16px;
+    }
+    .ir-copy-opt:last-of-type {
+        border-right: 1px solid rgba(34, 211, 238, 0.3);
+        border-radius: 0 16px 16px 0;
     }
 }

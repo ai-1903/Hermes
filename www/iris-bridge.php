@@ -55,12 +55,14 @@ require __DIR__ . '/view/header.php';
             <span class="ir-swatch" data-format="rgba"></span>
             <!-- 复制按钮：图标本体向右伸展为两个胶囊（移动端点击后横到输入框底部） -->
             <div class="ir-copy" data-format="rgba">
-                <button type="button" class="ir-copy-btn" title="复制 RGBA" aria-haspopup="true">
-                    <iconify-icon icon="fluent:copy-20-regular"></iconify-icon>
-                    <span class="ir-copy-opt" data-mode="space">空格分隔</span>
-                    <span class="ir-copy-opt" data-mode="comma">逗号分隔</span>
-                </button>
-            </div>
+                    <button type="button" class="ir-copy-btn" title="复制 RGBA" aria-haspopup="true">
+                        <iconify-icon icon="fluent:copy-20-regular"></iconify-icon>
+                        <div class="ir-copy-menu">
+                            <span class="ir-copy-opt" data-mode="space">空格分隔</span>
+                            <span class="ir-copy-opt" data-mode="comma">逗号分隔</span>
+                        </div>
+                    </button>
+                </div>
         </div>
 
         <!-- HEX -->
@@ -72,12 +74,14 @@ require __DIR__ . '/view/header.php';
             </div>
             <span class="ir-swatch" data-format="hex"></span>
             <div class="ir-copy" data-format="hex">
-                <button type="button" class="ir-copy-btn" title="复制 HEX" aria-haspopup="true">
-                    <iconify-icon icon="fluent:copy-20-regular"></iconify-icon>
-                    <span class="ir-copy-opt" data-mode="hash">带 #</span>
-                    <span class="ir-copy-opt" data-mode="nohash">不带 #</span>
-                </button>
-            </div>
+                    <button type="button" class="ir-copy-btn" title="复制 HEX" aria-haspopup="true">
+                        <iconify-icon icon="fluent:copy-20-regular"></iconify-icon>
+                        <div class="ir-copy-menu">
+                            <span class="ir-copy-opt" data-mode="hash">带 #</span>
+                            <span class="ir-copy-opt" data-mode="nohash">不带 #</span>
+                        </div>
+                    </button>
+                </div>
         </div>
 
         <!-- OKLCH -->
@@ -91,12 +95,14 @@ require __DIR__ . '/view/header.php';
             </div>
             <span class="ir-swatch" data-format="oklch"></span>
             <div class="ir-copy" data-format="oklch">
-                <button type="button" class="ir-copy-btn" title="复制 OKLCH" aria-haspopup="true">
-                    <iconify-icon icon="fluent:copy-20-regular"></iconify-icon>
-                    <span class="ir-copy-opt" data-mode="space">空格分隔</span>
-                    <span class="ir-copy-opt" data-mode="comma">逗号分隔</span>
-                </button>
-            </div>
+                    <button type="button" class="ir-copy-btn" title="复制 OKLCH" aria-haspopup="true">
+                        <iconify-icon icon="fluent:copy-20-regular"></iconify-icon>
+                        <div class="ir-copy-menu">
+                            <span class="ir-copy-opt" data-mode="space">空格分隔</span>
+                            <span class="ir-copy-opt" data-mode="comma">逗号分隔</span>
+                        </div>
+                    </button>
+                </div>
         </div>
 
         <!-- CMYK -->
@@ -110,12 +116,14 @@ require __DIR__ . '/view/header.php';
             </div>
             <span class="ir-swatch" data-format="cmyk"></span>
             <div class="ir-copy" data-format="cmyk">
-                <button type="button" class="ir-copy-btn" title="复制 CMYK" aria-haspopup="true">
-                    <iconify-icon icon="fluent:copy-20-regular"></iconify-icon>
-                    <span class="ir-copy-opt" data-mode="space">空格分隔</span>
-                    <span class="ir-copy-opt" data-mode="comma">逗号分隔</span>
-                </button>
-            </div>
+                    <button type="button" class="ir-copy-btn" title="复制 CMYK" aria-haspopup="true">
+                        <iconify-icon icon="fluent:copy-20-regular"></iconify-icon>
+                        <div class="ir-copy-menu">
+                            <span class="ir-copy-opt" data-mode="space">空格分隔</span>
+                            <span class="ir-copy-opt" data-mode="comma">逗号分隔</span>
+                        </div>
+                    </button>
+                </div>
         </div>
 
     </section>
