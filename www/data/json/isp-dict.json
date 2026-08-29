@@ -212,7 +212,8 @@
       "name": "已知 VPN / 代理",
       "region": "全球 / VPN",
       "entries": [
-        { "keys": ["ikuuu", "IKUUU NETWORK", "IKUUU-AS-AP"], "name": "IKUUU VPN" }
+        { "keys": ["ikuuu", "IKUUU NETWORK", "IKUUU-AS-AP"], "name": "IKUUU VPN" },
+        { "keys": ["veee", "VEEE NETWORK", "VEEE-AS-AP"], "name": "VEEE VPN" }
       ]
     }
   ]

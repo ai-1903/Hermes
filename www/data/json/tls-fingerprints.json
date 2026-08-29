@@ -1,0 +1,14 @@
+{
+  "comment": "TLS 证书 SHA-256 指纹基线库（中间人劫持检测）。指纹为服务端实测各大站证书的 SHA-256 指纹，用于与当前网络下实际获取的指纹比对：一致 = 未被劫持；不一致 = 可能存在中间人劫持 / 私签证书。指纹可能随证书轮换而变化，必要时可更新。",
+  "version": 1,
+  "fingerprints": {
+    "www.baidu.com": "ca5688c552685190e98b94c40e94f842ee7fda39b08846fbd4d7e2ed7211b4f2",
+    "www.qq.com": "6a488a254da0d877b1377517c6f30a25d0a588f9aea39f2e2f5bc255f5e0ca29",
+    "www.taobao.com": "e61e194e3b426e4ebdc6b7b378928590b44854640f1e152f3c7269a506bd6700",
+    "www.google.com": "db62eab0c82bed21524bf1991be222246a6ea5cf401a5d81b06fbc7e42ce0bee",
+    "www.cloudflare.com": "67947e58370d4bc680d1cb1880f4f17fdd13674a44c51101b552b7b27a55063d",
+    "example.com": "6153a96fd1a6ab7f4d438fc34932484299d0729d9140b3a126bb2f9c07b02200",
+    "www.bing.com": "d66792123698d135fa58d5374b97d421c5489e79ce046724d0f8ee4d3678a53e",
+    "www.bilibili.com": "3738eeef602a26d14d9b66324a094a4b47e30802f09b434d859ac40f8bb7f5d6"
+  }
+}
