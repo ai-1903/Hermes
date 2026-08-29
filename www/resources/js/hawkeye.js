@@ -3,7 +3,7 @@
  * 类别：页面
  * 依赖：lib/network.js
  * 职责：仅支持根域名；通过公共 RDAP 服务查询 Whois 信息，以带图标表头的
- *       <table> 展示（表头图标来自 iconify:fluent）。
+ *       <table> 展示（表头图标来自 iconify:fluent 的 regular 线性变体）。
  */
 (function () {
     'use strict';
@@ -19,16 +19,16 @@
         'https://rdap.verisign.com/net/v1/domain/{domain}',
     ];
 
-    /** 字段 → { label, icon }（fluent 图标） */
+    /** 字段 → { label, icon }（fluent 线性变体） */
     var FIELD_META = {
-        '域名':    { icon: 'fluent:globe-20-filled' },
-        '注册商':  { icon: 'fluent:briefcase-20-filled' },
-        '状态':    { icon: 'fluent:checkmark-circle-20-filled' },
-        '注册时间': { icon: 'fluent:calendar-edit-20-filled' },
-        '过期时间': { icon: 'fluent:calendar-arrow-right-20-filled' },
-        '更新时间': { icon: 'fluent:clock-20-filled' },
-        'Name Server': { icon: 'fluent:server-20-filled' },
-        'DNSSEC': { icon: 'fluent:shield-checkmark-20-filled' },
+        '域名':    { icon: 'fluent:globe-20-regular' },
+        '注册商':  { icon: 'fluent:briefcase-20-regular' },
+        '状态':    { icon: 'fluent:checkmark-circle-20-regular' },
+        '注册时间': { icon: 'fluent:calendar-edit-20-regular' },
+        '过期时间': { icon: 'fluent:calendar-arrow-right-20-regular' },
+        '更新时间': { icon: 'fluent:clock-20-regular' },
+        'Name Server': { icon: 'fluent:server-20-regular' },
+        'DNSSEC': { icon: 'fluent:shield-checkmark-20-regular' },
     };
 
     function escapeHtml(s) {
@@ -105,7 +105,7 @@
         result.appendChild(d);
     }
 
-    /** 以表格渲染（表头带 iconify 图标） */
+    /** 以表格渲染（表头带 iconify 线性图标） */
     function renderTable(rows) {
         result.innerHTML = '';
         if (!rows.length) { showMsg('未查询到可展示的 Whois 信息'); return; }
@@ -119,9 +119,9 @@
         var thead = document.createElement('thead');
         var trHead = document.createElement('tr');
         var thK = document.createElement('th');
-        thK.innerHTML = '<span class="th-inner"><iconify-icon icon="fluent:tag-20-filled"></iconify-icon> 字段</span>';
+        thK.innerHTML = '<span class="th-inner"><iconify-icon icon="fluent:tag-20-regular"></iconify-icon> 字段</span>';
         var thV = document.createElement('th');
-        thV.innerHTML = '<span class="th-inner"><iconify-icon icon="fluent:info-20-filled"></iconify-icon> 内容</span>';
+        thV.innerHTML = '<span class="th-inner"><iconify-icon icon="fluent:info-20-regular"></iconify-icon> 内容</span>';
         trHead.appendChild(thK);
         trHead.appendChild(thV);
         thead.appendChild(trHead);

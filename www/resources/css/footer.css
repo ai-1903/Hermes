@@ -1,11 +1,11 @@
 /* ==========================================================================
-   footer.css — 公共尾部组件（苹果风页脚）
+   footer.css — 公共尾部组件（科幻风页脚）
    类别：组件（site-footer / copyright）
    ========================================================================== */
 
 .site-footer {
     margin-top: auto;
-    background: #fafafa;
+    background: rgba(10, 16, 26, 0.5);
     border-top: 1px solid var(--border);
     padding: 18px 0;
     text-align: center;
@@ -13,11 +13,11 @@
 
 .copyright {
     font-size: 0.8rem;
-    color: var(--text-secondary);
+    color: var(--text-dim);
 }
 
 .copyright a {
-    color: var(--text);
+    color: var(--text-secondary);
     text-decoration: none;
     transition: color 0.2s;
 }

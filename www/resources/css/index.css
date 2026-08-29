@@ -1,5 +1,5 @@
 /* ==========================================================================
-   index.css — 首页页面样式（苹果风 Hero + 功能入口）
+   index.css — 首页页面样式（科幻风 Hero + 功能入口）
    类别：页面（index.php 专属）
    ========================================================================== */
 
@@ -8,18 +8,35 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 40px 24px;
+    padding: 48px 24px;
+    position: relative;
+}
+
+/* 顶部青色光晕装饰 */
+.site-main::before {
+    content: '';
+    position: absolute;
+    top: -80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 640px;
+    height: 320px;
+    background: radial-gradient(50% 50% at 50% 50%, rgba(34, 211, 238, 0.10), transparent 70%);
+    pointer-events: none;
 }
 
 .hero {
     max-width: 760px;
     text-align: center;
+    position: relative;
+    z-index: 1;
 }
 
 .hero-icon {
     font-size: 3.2rem;
     color: var(--accent);
     margin-bottom: 16px;
+    filter: drop-shadow(0 0 12px rgba(34, 211, 238, 0.5));
 }
 
 .hero h1 {
@@ -37,17 +54,24 @@
 }
 
 .hero-cta {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     padding: 12px 30px;
     border-radius: var(--radius-pill);
-    background: var(--accent);
-    color: #fff;
+    background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+    color: #04121a;
+    font-weight: 700;
     font-size: 0.95rem;
     text-decoration: none;
-    transition: background 0.2s;
+    box-shadow: 0 0 20px rgba(34, 211, 238, 0.25);
+    transition: filter 0.2s, box-shadow 0.2s;
 }
 
-.hero-cta:hover { background: var(--accent-hover); }
+.hero-cta:hover {
+    filter: brightness(1.12);
+    box-shadow: 0 0 30px rgba(34, 211, 238, 0.4);
+}
 
 .hero-cta .cta-icon { vertical-align: -0.15em; }
 
@@ -65,17 +89,20 @@
     align-items: center;
     gap: 14px;
     padding: 18px 20px;
-    background: var(--bg-elevated);
+    background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
     text-decoration: none;
     color: var(--text);
-    transition: transform 0.15s, box-shadow 0.15s;
+    transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
 }
 
 .entry-card:hover {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-card);
+    border-color: rgba(34, 211, 238, 0.35);
+    box-shadow: 0 0 22px rgba(34, 211, 238, 0.12);
 }
 
 .entry-card iconify-icon { font-size: 26px; color: var(--accent); flex-shrink: 0; }

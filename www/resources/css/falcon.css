@@ -1,0 +1,213 @@
+/* ==========================================================================
+   falcon.css — 天隼页面样式（科幻风全屏 Hero，无卡片框架）
+   类别：页面（falcon.php 专属）
+   ========================================================================== */
+
+.falcon-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 60px 24px 80px;
+}
+
+/* ---- 居中 Hero（巨大 IP） ---- */
+.falcon-hero {
+    text-align: center;
+    max-width: 100%;
+    margin-bottom: 64px;
+    position: relative;
+}
+
+/* 顶部青色辉光 */
+.falcon-hero::before {
+    content: '';
+    position: absolute;
+    top: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 480px;
+    height: 240px;
+    background: radial-gradient(50% 50% at 50% 50%, rgba(34, 211, 238, 0.12), transparent 70%);
+    pointer-events: none;
+}
+
+.ip-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.ip-label::before,
+.ip-label::after {
+    content: '';
+    display: inline-block;
+    vertical-align: middle;
+    width: 28px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent));
+    margin: 0 14px;
+    opacity: 0.6;
+}
+
+.ip-label::after {
+    background: linear-gradient(90deg, var(--accent), transparent);
+}
+
+.ip-value {
+    font-family: var(--mono);
+    font-size: clamp(3rem, 12vw, 6.5rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    color: #eaf6ff;
+    text-shadow: 0 0 30px rgba(34, 211, 238, 0.45);
+    word-break: break-all;
+    position: relative;
+    margin-bottom: 18px;
+}
+
+.ip-value.loading {
+    color: var(--text-dim);
+    font-size: clamp(1.6rem, 5vw, 2.2rem);
+    text-shadow: none;
+    animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+}
+
+.ip-isp {
+    font-size: 1.15rem;
+    color: var(--text-secondary);
+    margin-bottom: 18px;
+}
+
+/* ---- 标签行 ---- */
+.ip-tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    position: relative;
+}
+
+.ip-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px;
+    border-radius: var(--radius-pill);
+    font-size: 0.82rem;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-secondary);
+}
+
+.ip-tag iconify-icon { font-size: 14px; color: var(--accent); }
+
+.ip-tag .tag-label {
+    color: var(--text-dim);
+    margin-right: 2px;
+}
+
+.ip-tag .tag-value {
+    color: var(--text);
+    font-weight: 600;
+}
+
+/* 网络环境标签配色 */
+.ip-tag.env-datacenter iconify-icon { color: var(--orange); }
+.ip-tag.env-home iconify-icon { color: var(--green); }
+.ip-tag.env-unknown iconify-icon { color: var(--text-dim); }
+
+/* ---- 近期出站 IP 历史 ---- */
+.ip-history {
+    width: 100%;
+    max-width: 760px;
+    text-align: left;
+}
+
+.history-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 0.04em;
+}
+
+.history-head iconify-icon { color: var(--accent); font-size: 1.1rem; }
+
+.fc-history-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.fc-history-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+.fc-history-ip {
+    flex: 1;
+    min-width: 0;
+    font-family: var(--mono);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    word-break: break-all;
+}
+
+.fc-history-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+    font-size: 0.78rem;
+    color: var(--accent);
+    background: rgba(34, 211, 238, 0.1);
+    padding: 3px 10px;
+    border-radius: var(--radius-pill);
+}
+
+.fc-history-count iconify-icon { font-size: 13px; }
+
+.fc-history-time {
+    flex-shrink: 0;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    font-family: var(--mono);
+}
+
+.fc-history-empty {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    padding: 14px 4px;
+}
+
+/* 移动端适配 */
+@media (max-width: 620px) {
+    .falcon-main { padding: 48px 20px 64px; }
+    .falcon-hero { margin-bottom: 48px; }
+    .fc-history-item { flex-wrap: wrap; gap: 8px 14px; }
+    .fc-history-time { width: 100%; padding-left: 0; }
+}

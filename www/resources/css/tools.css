@@ -1,6 +1,6 @@
 /* ==========================================================================
-   tools.css — 网络工具页面共享样式（苹果风）
-   类别：页面（Online Test / Hawkeye / 天隼 共用布局）
+   tools.css — 网络工具页面共享样式（科幻风）
+   类别：页面（Online Test / Hawkeye / 天隼共用布局）
    ========================================================================== */
 
 .tool-main {
@@ -14,9 +14,11 @@
 .tool-card {
     width: 100%;
     max-width: 700px;
-    background: var(--bg-elevated);
+    background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
     padding: 32px 36px;
     box-shadow: var(--shadow-card);
 }
@@ -39,6 +41,15 @@
     margin-bottom: 26px;
 }
 
+.tool-desc code {
+    font-family: var(--mono);
+    color: var(--accent);
+    background: rgba(34, 211, 238, 0.1);
+    padding: 1px 6px;
+    border-radius: 6px;
+    font-size: 0.82rem;
+}
+
 /* 输入行：协议选项卡 + 输入框 + 按钮 */
 .tool-input-row {
     display: flex;
@@ -49,7 +60,8 @@
 
 .proto-tabs {
     display: flex;
-    background: rgba(0, 0, 0, 0.05);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border);
     border-radius: 10px;
     padding: 3px;
     flex-shrink: 0;
@@ -68,50 +80,56 @@
 }
 
 .proto-tab.active {
-    background: #fff;
-    color: var(--text);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+    background: rgba(34, 211, 238, 0.15);
+    color: #a5f3fc;
+    box-shadow: inset 0 0 10px rgba(34, 211, 238, 0.12);
 }
 
 .tool-input {
     flex: 1;
     min-width: 0;
     padding: 11px 16px;
-    background: var(--bg);
+    background: rgba(255, 255, 255, 0.04);
     border: 1px solid var(--border);
     border-radius: 10px;
     color: var(--text);
-    font-size: 0.95rem;
+    font-family: var(--mono);
+    font-size: 0.9rem;
     outline: none;
     transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .tool-input:focus {
     border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
+    box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.15);
 }
 
-.tool-input::placeholder { color: var(--text-secondary); opacity: 0.7; }
+.tool-input::placeholder { color: var(--text-dim); }
 
 .tool-btn {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     padding: 11px 24px;
-    background: var(--accent);
-    color: #fff;
-    font-weight: 600;
+    background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+    color: #04121a;
+    font-weight: 700;
     font-size: 0.92rem;
     border: none;
     border-radius: var(--radius-pill);
     cursor: pointer;
     flex-shrink: 0;
-    transition: background 0.2s, transform 0.05s;
+    box-shadow: 0 0 14px rgba(34, 211, 238, 0.2);
+    transition: filter 0.2s, transform 0.05s, box-shadow 0.2s;
 }
 
-.tool-btn:hover { background: var(--accent-hover); }
+.tool-btn:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 0 22px rgba(34, 211, 238, 0.35);
+}
+
 .tool-btn:active { transform: scale(0.97); }
-.tool-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.tool-btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
 
 /* 检测结果 */
 .tool-result { margin-bottom: 22px; }
@@ -138,7 +156,7 @@
     justify-content: space-between;
     gap: 12px;
     padding: 11px 16px;
-    background: var(--bg);
+    background: rgba(255, 255, 255, 0.04);
     border: 1px solid var(--border);
     border-radius: 10px;
     font-size: 0.9rem;
@@ -146,7 +164,7 @@
 
 .result-lines .host {
     word-break: break-all;
-    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-family: var(--mono);
     font-size: 0.85rem;
 }
 
@@ -162,11 +180,11 @@
     white-space: nowrap;
 }
 
-.st-online        { color: var(--green); background: rgba(52, 199, 89, 0.12); }
-.st-offline       { color: var(--red);   background: rgba(255, 59, 48, 0.1); }
-.st-local-online  { color: var(--orange); background: rgba(255, 149, 0, 0.12); }
-.st-local-offline { color: var(--red);   background: rgba(255, 59, 48, 0.1); }
-.st-loopback      { color: var(--blue);  background: rgba(0, 122, 255, 0.1); }
+.st-online        { color: var(--green); background: rgba(52, 211, 153, 0.12); }
+.st-offline       { color: var(--red);   background: rgba(248, 113, 113, 0.12); }
+.st-local-online  { color: var(--orange); background: rgba(251, 191, 36, 0.12); }
+.st-local-offline { color: var(--red);   background: rgba(248, 113, 113, 0.12); }
+.st-loopback      { color: var(--blue);  background: rgba(96, 165, 250, 0.12); }
 
 /* 历史记录 */
 .history-wrap {
@@ -199,7 +217,7 @@
     align-items: center;
     gap: 10px;
     padding: 8px 12px;
-    background: var(--bg);
+    background: rgba(255, 255, 255, 0.04);
     border: 1px solid var(--border);
     border-radius: 9px;
     font-size: 0.84rem;
@@ -217,7 +235,7 @@
     flex: 1;
     min-width: 0;
     word-break: break-all;
-    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-family: var(--mono);
     font-size: 0.8rem;
     cursor: pointer;
 }
@@ -242,7 +260,7 @@
     justify-content: center;
     background: transparent;
     border: none;
-    color: var(--text-secondary);
+    color: var(--text-dim);
     font-size: 1rem;
     cursor: pointer;
     border-radius: 50%;
@@ -250,7 +268,7 @@
 }
 
 .history-del:hover {
-    background: rgba(255, 59, 48, 0.12);
+    background: rgba(248, 113, 113, 0.12);
     color: var(--red);
 }
 
@@ -266,7 +284,14 @@
     padding: 8px 0;
 }
 
-/* ---------- 数据表格（Hawkeye 等） ---------- */
+/* 通配符结果（Online Test） */
+.wild-loading {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    padding: 8px 0;
+}
+
+/* ---------- 数据表格（Hawkeye / 天隼） ---------- */
 .tool-table-wrap {
     overflow-x: auto;
     margin-top: 6px;
@@ -283,15 +308,15 @@ table.tool-table {
 .tool-table thead th {
     text-align: left;
     padding: 12px 16px;
-    background: #fafafa;
+    background: rgba(255, 255, 255, 0.04);
     border-bottom: 1px solid var(--border);
     font-size: 0.78rem;
     font-weight: 600;
-    color: var(--text-secondary);
+    color: var(--text-dim);
     letter-spacing: 0.03em;
 }
 
-/* 表头图标：表头内容居中配图标，单元格文本仍左对齐 */
+/* 表头图标：表头内容配图标，单元格文本仍左对齐 */
 .tool-table th .th-inner {
     display: inline-flex;
     align-items: center;
@@ -309,9 +334,9 @@ table.tool-table {
 
 .tool-table tbody tr:last-child td { border-bottom: none; }
 
-.tool-table tbody tr:hover td { background: rgba(0, 0, 0, 0.015); }
+.tool-table tbody tr:hover td { background: rgba(34, 211, 238, 0.03); }
 
-.tool-table .k { color: var(--text-secondary); white-space: nowrap; }
+.tool-table .k { color: var(--text-dim); white-space: nowrap; }
 
 /* 字段单元格（键名 + 图标） */
 .tool-table .field-cell {
@@ -326,44 +351,11 @@ table.tool-table {
     display: inline-block;
     margin: 2px 6px 2px 0;
     padding: 2px 10px;
-    background: rgba(0, 122, 255, 0.08);
-    color: var(--blue);
+    background: rgba(34, 211, 238, 0.1);
+    color: var(--accent);
     border-radius: var(--radius-pill);
     font-size: 0.78rem;
 }
-
-/* 天隼 */
-.ip-btn { margin-bottom: 24px; }
-
-.ip-result {
-    text-align: center;
-    padding: 24px;
-    background: var(--bg);
-    border: 1px dashed var(--border);
-    border-radius: var(--radius-md);
-}
-
-.ip-placeholder {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-}
-
-.ip-value {
-    font-size: 2rem;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    color: var(--text);
-    margin-bottom: 12px;
-    word-break: break-all;
-}
-
-.ip-meta {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-}
-
-/* 通配符结果（Online Test） */
-.wild-loading { font-size: 0.85rem; color: var(--text-secondary); padding: 8px 0; }
 
 /* 移动端适配 */
 @media (max-width: 620px) {

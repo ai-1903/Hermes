@@ -23,7 +23,7 @@ require __DIR__ . '/view/header.php';
 ?>
 <main class="tool-main">
     <div class="tool-card">
-        <h2 class="tool-title"><iconify-icon icon="fluent:wifi-3-20-filled"></iconify-icon> Online Test</h2>
+        <h2 class="tool-title"><iconify-icon icon="fluent:wifi-3-20-regular"></iconify-icon> Online Test</h2>
         <p class="tool-desc">输入域名或 IP 地址检测是否在线；根域名自动双测 www. 与根域，支持 <code>*.域名</code> 通配符探测常见子域。</p>
 
         <div class="tool-input-row">

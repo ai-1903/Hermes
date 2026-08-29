@@ -1,26 +1,31 @@
 /* ==========================================================================
-   base.css — 全局基础样式（苹果官网风格：简约、大气、浅色）
+   base.css — 全局基础样式（科幻 + 现代极简风）
    类别：全局 / 基础（变量、重置、排版、通用容器）
+   风格：深空底色、青色辉光、极细分割线、科技感排版
    ========================================================================== */
 
 :root {
-    --bg: #f5f5f7;                    /* 苹果经典浅灰背景 */
-    --bg-elevated: #ffffff;           /* 卡片 / 面板 */
-    --text: #1d1d1f;                  /* 苹果主文字 */
-    --text-secondary: #6e6e73;        /* 次级文字 */
-    --border: rgba(0, 0, 0, 0.08);    /* 极细分割线 */
-    --accent: #0071e3;                /* 苹果蓝 */
-    --accent-hover: #0077ed;
-    --green: #34c759;
-    --red: #ff3b30;
-    --orange: #ff9500;
-    --blue: #007aff;
+    --bg: #070b12;                          /* 深空蓝黑 */
+    --surface: rgba(15, 23, 42, 0.55);      /* 卡片 / 面板（半透明） */
+    --surface-solid: #0c1322;
+    --text: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --text-dim: #64748b;
+    --border: rgba(148, 163, 184, 0.16);    /* 极细分割线 */
+    --accent: #22d3ee;                      /* 科技青 */
+    --accent-strong: #38bdf8;
+    --green: #34d399;
+    --red: #f87171;
+    --orange: #fbbf24;
+    --blue: #60a5fa;
+    --glow: rgba(34, 211, 238, 0.35);
     --radius-lg: 18px;
     --radius-md: 12px;
     --radius-pill: 980px;
-    --shadow-card: 0 2px 16px rgba(0, 0, 0, 0.06);
+    --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.35);
     --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
             "Segoe UI", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -40,6 +45,18 @@ body {
     line-height: 1.5;
 }
 
+/* 顶部环境光晕 */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        radial-gradient(60% 40% at 50% -5%, rgba(34, 211, 238, 0.10), transparent 60%),
+        radial-gradient(40% 30% at 90% 10%, rgba(96, 165, 250, 0.07), transparent 60%);
+}
+
 .container {
     max-width: 1100px;
     margin: 0 auto;
@@ -50,9 +67,14 @@ body {
 /* Iconify 图标内联对齐 */
 iconify-icon { vertical-align: -0.125em; }
 
-/* 焦点可见性（苹果风蓝色光晕） */
+/* 焦点可见性（青色光晕） */
 :focus-visible {
-    outline: 3px solid rgba(0, 113, 227, 0.35);
+    outline: 2px solid rgba(34, 211, 238, 0.5);
     outline-offset: 2px;
     border-radius: 4px;
 }
+
+/* 滚动条（极简） */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.3); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.5); }

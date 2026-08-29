@@ -48,7 +48,7 @@ $pageScripts = $pageScripts ?? [];
 <header class="site-header">
     <div class="container header-inner">
         <a class="brand" href="index.php">
-            <iconify-icon icon="fluent:rocket-20-filled"></iconify-icon>
+            <iconify-icon icon="fluent:rocket-20-regular"></iconify-icon>
             <?= htmlspecialchars($siteName, ENT_QUOTES, 'UTF-8') ?>
         </a>
 
