@@ -43,6 +43,8 @@ body {
     display: flex;
     flex-direction: column;
     line-height: 1.5;
+    /* 为 fixed 导航栏预留 54px 顶部空间 */
+    padding-top: 54px;
 }
 
 /* 顶部环境光晕 */
