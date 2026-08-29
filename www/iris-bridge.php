@@ -5,9 +5,10 @@
  * 分层：view 入口（展示）
  * 职责：颜色板与色彩编码转换工具。左侧可拖拽调色盘（含透明度条），
  *       右侧 RGB(A) / HEX / OKLCH / CMYK 输入框组，双向同步转换。
- *       - 每个输入框组行尾有圆形颜色示意 + 圆形复制按钮（悬停展开胶囊选项）
+ *       - 每个输入框组行尾有圆形颜色示意 + 复制按钮（悬停/点击本体向右
+ *         伸展为两个胶囊选项；移动端点击后横排到输入框底部）
  *       - 输入框失焦时更新并同步其它格式
- *       - 色域不支持时以模态框提示（布局不偏移）
+ *       - 色域不支持时以页面底部横幅提示（P3 超出 sRGB / CMYK 超出 sRGB）
  *       逻辑在 resources/js/iris-bridge.js，样式在 resources/css/iris-bridge.css。
  */
 require __DIR__ . '/system/App.php';
@@ -46,14 +47,13 @@ require __DIR__ . '/view/header.php';
                 <input type="number" class="ir-input ir-rgba ir-alpha" data-ch="a" min="0" max="1" step="0.01" placeholder="A">
             </div>
             <span class="ir-swatch" data-format="rgba"></span>
+            <!-- 复制按钮：图标本体向右伸展为两个胶囊（移动端点击后横到输入框底部） -->
             <div class="ir-copy" data-format="rgba">
-                <button type="button" class="ir-copy-btn" title="复制 RGBA">
+                <button type="button" class="ir-copy-btn" title="复制 RGBA" aria-haspopup="true">
                     <iconify-icon icon="fluent:copy-20-regular"></iconify-icon>
+                    <span class="ir-copy-opt" data-mode="space">空格分隔</span>
+                    <span class="ir-copy-opt" data-mode="comma">逗号分隔</span>
                 </button>
-                <div class="ir-copy-menu">
-                    <button type="button" class="ir-copy-opt" data-mode="space">空格分隔</button>
-                    <button type="button" class="ir-copy-opt" data-mode="comma">逗号分隔</button>
-                </div>
             </div>
         </div>
 
@@ -66,13 +66,11 @@ require __DIR__ . '/view/header.php';
             </div>
             <span class="ir-swatch" data-format="hex"></span>
             <div class="ir-copy" data-format="hex">
-                <button type="button" class="ir-copy-btn" title="复制 HEX">
+                <button type="button" class="ir-copy-btn" title="复制 HEX" aria-haspopup="true">
                     <iconify-icon icon="fluent:copy-20-regular"></iconify-icon>
+                    <span class="ir-copy-opt" data-mode="hash">带 #</span>
+                    <span class="ir-copy-opt" data-mode="nohash">不带 #</span>
                 </button>
-                <div class="ir-copy-menu">
-                    <button type="button" class="ir-copy-opt" data-mode="hash">带 #</button>
-                    <button type="button" class="ir-copy-opt" data-mode="nohash">不带 #</button>
-                </div>
             </div>
         </div>
 
@@ -87,13 +85,11 @@ require __DIR__ . '/view/header.php';
             </div>
             <span class="ir-swatch" data-format="oklch"></span>
             <div class="ir-copy" data-format="oklch">
-                <button type="button" class="ir-copy-btn" title="复制 OKLCH">
+                <button type="button" class="ir-copy-btn" title="复制 OKLCH" aria-haspopup="true">
                     <iconify-icon icon="fluent:copy-20-regular"></iconify-icon>
+                    <span class="ir-copy-opt" data-mode="space">空格分隔</span>
+                    <span class="ir-copy-opt" data-mode="comma">逗号分隔</span>
                 </button>
-                <div class="ir-copy-menu">
-                    <button type="button" class="ir-copy-opt" data-mode="space">空格分隔</button>
-                    <button type="button" class="ir-copy-opt" data-mode="comma">逗号分隔</button>
-                </div>
             </div>
         </div>
 
@@ -108,28 +104,30 @@ require __DIR__ . '/view/header.php';
             </div>
             <span class="ir-swatch" data-format="cmyk"></span>
             <div class="ir-copy" data-format="cmyk">
-                <button type="button" class="ir-copy-btn" title="复制 CMYK">
+                <button type="button" class="ir-copy-btn" title="复制 CMYK" aria-haspopup="true">
                     <iconify-icon icon="fluent:copy-20-regular"></iconify-icon>
+                    <span class="ir-copy-opt" data-mode="space">空格分隔</span>
+                    <span class="ir-copy-opt" data-mode="comma">逗号分隔</span>
                 </button>
-                <div class="ir-copy-menu">
-                    <button type="button" class="ir-copy-opt" data-mode="space">空格分隔</button>
-                    <button type="button" class="ir-copy-opt" data-mode="comma">逗号分隔</button>
-                </div>
             </div>
         </div>
 
     </section>
 
-    <!-- 色域不支持模态框 -->
-    <div class="ir-modal-overlay" id="ir-modal" hidden>
-        <div class="ir-modal">
-            <div class="ir-modal-icon">
-                <iconify-icon icon="fluent:warning-20-regular"></iconify-icon>
-            </div>
-            <div class="ir-modal-title">色域提示</div>
-            <div class="ir-modal-text" id="ir-modal-text"></div>
-            <button type="button" class="ir-modal-btn" id="ir-modal-close">知道了</button>
-        </div>
+    <!-- 底部横幅：色域提示（fixed 定位，不影响布局） -->
+    <div class="ir-banner" id="ir-banner-p3" hidden>
+        <iconify-icon icon="fluent:warning-20-regular"></iconify-icon>
+        <span class="ir-banner-text">当前颜色位于 P3 广色域，超出 sRGB 可表达范围，RGBA / HEX / CMYK 显示为近似值。</span>
+        <button type="button" class="ir-banner-close" aria-label="关闭横幅">
+            <iconify-icon icon="fluent:dismiss-20-regular"></iconify-icon>
+        </button>
+    </div>
+    <div class="ir-banner" id="ir-banner-cmyk" hidden>
+        <iconify-icon icon="fluent:warning-20-regular"></iconify-icon>
+        <span class="ir-banner-text">当前颜色超出 CMYK 印刷色域，CMYK 显示为近似值。</span>
+        <button type="button" class="ir-banner-close" aria-label="关闭横幅">
+            <iconify-icon icon="fluent:dismiss-20-regular"></iconify-icon>
+        </button>
     </div>
 
 </main>

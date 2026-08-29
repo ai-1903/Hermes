@@ -19,9 +19,8 @@
     var alphaCan   = document.getElementById('ir-alpha');
     var alphaCtx   = alphaCan.getContext('2d');
     var alphaThumb = document.getElementById('ir-alpha-thumb');
-    var modal      = document.getElementById('ir-modal');
-    var modalText  = document.getElementById('ir-modal-text');
-    var modalClose = document.getElementById('ir-modal-close');
+    var bannerP3   = document.getElementById('ir-banner-p3');
+    var bannerCmyk = document.getElementById('ir-banner-cmyk');
 
     function qa(sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); }
 
@@ -327,9 +326,11 @@
         if (isNaN(l) || isNaN(c) || isNaN(h)) return;
         if (isNaN(a)) a = 1;
         a = clamp(a, 0, 1);
-        // 色域判断：OKLCH 超出 sRGB（P3）→ 模态框提示
+        // 色域判断：OKLCH 超出 sRGB（P3）→ 底部横幅提示
         if (oklchOutOfSrgb(l, c, h)) {
-            showModal('当前 OKLCH 颜色位于 P3 等广色域，超出标准 sRGB 显示色域。RGBA 与 CMYK 输入框显示的是近似值，可能与实际略有差异。');
+            showBanner('p3');
+        } else {
+            hideBanner('p3');
         }
         var lin = oklchToLinearRgb(l, c, h);
         state.r = Math.round(clamp(linearToSrgbRaw(lin[0]) * 255, 0, 255));
@@ -348,28 +349,25 @@
         // CMYK 色域判断
         var check = rgbToCmyk(state.r, state.g, state.b);
         if (cmykOutOfGamut(check.c, check.m, check.y)) {
-            showModal('当前颜色超出 CMYK 印刷色域，CMYK 显示的是近似值，可能与实际略有差异。');
+            showBanner('cmyk');
+        } else {
+            hideBanner('cmyk');
         }
         var rgb = cmykToRgb(c, m, y, k);
         state.r = rgb.r; state.g = rgb.g; state.b = rgb.b;
     }
 
-    /* ================= 模态框 ================= */
-    function showModal(text) {
-        modalText.textContent = text;
-        modal.hidden = false;
+    /* ================= 底部横幅（色域提示） ================= */
+    function showBanner(kind) {
+        var b = kind === 'cmyk' ? bannerCmyk : bannerP3;
+        if (b) b.hidden = false;
     }
-    function hideModal() {
-        modal.hidden = true;
+    function hideBanner(kind) {
+        var b = kind === 'cmyk' ? bannerCmyk : bannerP3;
+        if (b) b.hidden = true;
     }
-    modalClose.addEventListener('click', hideModal);
-    // 点击遮罩层 / Esc 也可关闭（真正的「有效隐藏」）
-    modal.addEventListener('click', function (e) {
-        if (e.target === modal) hideModal();   // 仅当点遮罩本身（非内部卡片）
-    });
-    document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') hideModal();
-    });
+    if (bannerP3) bannerP3.querySelector('.ir-banner-close').addEventListener('click', function () { hideBanner('p3'); });
+    if (bannerCmyk) bannerCmyk.querySelector('.ir-banner-close').addEventListener('click', function () { hideBanner('cmyk'); });
 
     /* ================= 输入事件绑定 ================= */
     function bindCommit(inputs, parser) {
@@ -466,7 +464,7 @@
     function oklchStr(mode) {
         var okl = rgbToOklch(state.r, state.g, state.b);
         var a = fmt(state.a, 3);
-        var core = fmt(okl.l, 4) + ' ' + fmt(okl.c, 4) + ' ' + fmt(okl.h, 1);
+        var core = fmt(okl.l, 4) + ' ' + fmt(okl.c, 4) + ' ' + fmt(okl.h, 2);
         return mode === 'space' ? core + ' / ' + a : core.replace(/ /g, ', ') + ', ' + a;
     }
     function cmykStr(mode) {
@@ -494,9 +492,17 @@
         ta.remove();
     }
 
+    /* ================= 复制按钮展开（本体伸展） =================
+       桌面：悬停（CSS :hover）时按钮本体向右伸展为两个胶囊；
+       移动端：点击按钮切换 .open 展开，两个胶囊横排到输入框底部。 */
+    function isMobile() {
+        return window.innerWidth <= 820;
+    }
+
     // 初始化每个复制按钮组
     Object.keys(copyStates).forEach(function (fmt) {
         var row = document.querySelector('.ir-row[data-format="' + fmt + '"]');
+        var copy = row.querySelector('.ir-copy');
         var btn = row.querySelector('.ir-copy-btn');
         var opts = row.querySelectorAll('.ir-copy-opt');
 
@@ -507,6 +513,16 @@
         }
         markActive();
 
+        // 移动端：点击按钮切换展开
+        if (btn) {
+            btn.addEventListener('click', function (e) {
+                if (!isMobile()) return;   // 桌面交给 CSS hover
+                e.stopPropagation();
+                copy.classList.toggle('open');
+            });
+        }
+
+        // 点击选项：复制（桌面展开态 / 移动端展开态下）
         opts.forEach(function (o) {
             o.addEventListener('click', function (e) {
                 e.stopPropagation();
@@ -515,6 +531,8 @@
                 copyText(COPY_FN[fmt](o.dataset.mode));
                 o.classList.add('copied');
                 setTimeout(function () { o.classList.remove('copied'); }, 1200);
+                // 移动端复制后收起
+                if (isMobile()) copy.classList.remove('open');
             });
         });
     });
