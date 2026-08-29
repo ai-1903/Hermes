@@ -57,9 +57,13 @@
         /**
          * 按内容实际高度设置容器高度（内容撑开）。
          * 上限：PC 50vh；移动端视口高度。内容超高时内部滚动。
+         * 测量前先把容器高度置为 auto，避免被先前较长菜单撑高时
+         * scrollHeight 返回容器高度（max(内容, 当前高)）导致长→短切换无法缩短。
          */
         function setHeightToContent() {
             if (!navBar) return;
+            // 先回归「内容撑开」，再读真实内容高度
+            navBar.style.height = 'auto';
             var content = navBar.scrollHeight;
             var max = isMobile() ? window.innerHeight : window.innerHeight * 0.5;
             var h = Math.min(content, max);
