@@ -222,11 +222,6 @@
 @media (max-width: 820px) {
     .hamburger { display: inline-flex; }
 
-    /* 移动端展开高度更大：容纳一级列表 + 二级分栏 */
-    .nav-bar.open {
-        height: 460px;
-    }
-
     /* nav-top 允许换行：第一行 LOGO+汉堡，一级列表换到下一行整宽 */
     .nav-top {
         flex-wrap: wrap;

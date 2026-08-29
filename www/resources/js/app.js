@@ -15,6 +15,7 @@
 
     var MOBILE_WIDTH = 820;
     var closeTimer = null;
+    var prevNavHeight = null;   // 记录展开子菜单前的容器高度（供折叠时精确回退）
 
     function isMobile() {
         return window.innerWidth <= MOBILE_WIDTH;
@@ -61,11 +62,16 @@
                 navBar.style.height = '';
             }
             closePanels();
+            prevNavHeight = null;
             if (hamburger) hamburger.setAttribute('aria-expanded', 'false');
         }
 
         /** 打开某个一级项对应的面板（容器保持展开，重新测量高度） */
         function openPanel(entry) {
+            // 记录展开子菜单前的容器高度（移动端折叠时精确回退到该高度）
+            if (navBar && navBar.classList.contains('open')) {
+                prevNavHeight = navBar.style.height || (navBar.offsetHeight + 'px');
+            }
             closePanels(entry);
             entry.item.classList.add('open');
             entry.btn.setAttribute('aria-expanded', 'true');
@@ -119,8 +125,13 @@
                     if (!isMobile()) {
                         collapseNav();
                     } else {
-                        // 移动端：仅收起子菜单，容器收缩到「只有一级菜单」的高度
-                        setHeightToContent();
+                        // 移动端：仅收起子菜单，容器精确回退到展开前的高度
+                        if (prevNavHeight) {
+                            navBar.style.height = prevNavHeight;
+                            prevNavHeight = null;
+                        } else {
+                            setHeightToContent();
+                        }
                     }
                 } else {
                     openPanel(entry);
