@@ -31,4 +31,13 @@ final class App
             'serverTime'  => date('Y-m-d H:i:s'),
         ];
     }
+
+    /** 组装公共尾部数据（版权信息） */
+    public static function footer(): array
+    {
+        return [
+            'copyright' => self::config()['copyright'],
+            'year'      => (int) date('Y'),
+        ];
+    }
 }

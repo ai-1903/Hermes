@@ -1,0 +1,28 @@
+/* ==========================================================================
+   footer.css — 公共尾部组件
+   类别：组件（site-footer / copyright）
+   ========================================================================== */
+
+.site-footer {
+    border-top: 1px solid var(--card-border);
+    background: rgba(0, 0, 0, 0.2);
+    padding: 20px 0;
+    text-align: center;
+}
+
+.copyright {
+    font-size: 0.85rem;
+    opacity: 0.75;
+}
+
+.copyright a {
+    color: var(--text-color);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-bottom-color 0.2s, color 0.2s;
+}
+
+.copyright a:hover {
+    color: var(--blue);
+    border-bottom-color: var(--blue);
+}

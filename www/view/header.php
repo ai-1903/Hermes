@@ -29,6 +29,7 @@ $pageScripts = $pageScripts ?? [];
     <!-- 全局样式：resources/css（按组件/类别存储） -->
     <link rel="stylesheet" href="resources/css/base.css">
     <link rel="stylesheet" href="resources/css/header.css">
+    <link rel="stylesheet" href="resources/css/footer.css">
     <?php foreach ($pageStyles as $href): ?>
     <link rel="stylesheet" href="<?= htmlspecialchars($href, ENT_QUOTES, 'UTF-8') ?>">
     <?php endforeach; ?>

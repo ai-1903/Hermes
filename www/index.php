@@ -8,7 +8,8 @@
  */
 require __DIR__ . '/system/App.php';
 
-$app = App::home();
+$app    = App::home();
+$footer = App::footer();
 
 // 传递给公共头部（view/header.php 约定）
 $siteName    = $app['title'];
@@ -29,4 +30,8 @@ require __DIR__ . '/view/header.php';
         <p class="time">服务器时间：<?= htmlspecialchars($app['serverTime'], ENT_QUOTES, 'UTF-8') ?></p>
     </div>
 </main>
-<?php require __DIR__ . '/view/footer.php'; ?>
+<?php
+$copyright     = $footer['copyright'];
+$copyrightYear = $footer['year'];
+require __DIR__ . '/view/footer.php';
+?>

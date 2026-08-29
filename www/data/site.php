@@ -12,4 +12,8 @@ return [
     'nav'  => [
         ['label' => '首页', 'href' => 'index.php'],
     ],
+    'copyright' => [
+        'holder' => 'iCerya',
+        'url'    => 'https://icerya.com',
+    ],
 ];
