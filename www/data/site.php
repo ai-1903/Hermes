@@ -11,6 +11,14 @@ return [
     'lang' => 'zh-CN',
     'nav'  => [
         ['label' => '首页', 'href' => 'index.php'],
+        [
+            'label'    => '网络工具',
+            'children' => [
+                ['label' => 'Online Test', 'href' => 'online-test.php'],
+                ['label' => 'Hawkeye', 'href' => 'hawkeye.php'],
+                ['label' => '天隼', 'href' => 'falcon.php'],
+            ],
+        ],
     ],
     'copyright' => [
         'holder' => 'iCerya',

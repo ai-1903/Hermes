@@ -13,6 +13,7 @@ $footer = App::footer();
 
 // 传递给公共头部（view/header.php 约定）
 $siteName    = $app['title'];
+$nav         = App::config()['nav'];
 $pageTitle   = $app['title'] . ' — 首页';
 $pageStyles  = ['resources/css/index.css'];
 $pageScripts = [];

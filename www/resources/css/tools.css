@@ -1,0 +1,328 @@
+/* ==========================================================================
+   tools.css — 网络工具页面共享样式
+   类别：页面（Online Test / Hawkeye / 天隼 共用布局）
+   ========================================================================== */
+
+.tool-main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.tool-card {
+    width: 100%;
+    max-width: 620px;
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 36px 40px;
+    box-shadow: var(--shadow);
+}
+
+.tool-title {
+    font-size: 1.6rem;
+    margin-bottom: 6px;
+    background: var(--accent-grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.tool-desc {
+    font-size: 0.85rem;
+    opacity: 0.7;
+    margin-bottom: 24px;
+}
+
+/* 输入行：协议选项卡 + 输入框 + 按钮 */
+.tool-input-row {
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.proto-tabs {
+    display: flex;
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.proto-tab {
+    padding: 0 14px;
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    font-size: 0.85rem;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: background 0.15s, opacity 0.15s;
+}
+
+.proto-tab.active {
+    background: rgba(100, 181, 246, 0.2);
+    opacity: 1;
+}
+
+.tool-input {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    color: var(--text-color);
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.tool-input:focus {
+    border-color: var(--blue);
+}
+
+.tool-input::placeholder {
+    color: rgba(232, 240, 243, 0.4);
+}
+
+.tool-btn {
+    padding: 12px 22px;
+    background: linear-gradient(90deg, #64b5f6, #4dd0e1);
+    color: #0f2027;
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: filter 0.15s, transform 0.05s;
+}
+
+.tool-btn:hover { filter: brightness(1.08); }
+.tool-btn:active { transform: scale(0.97); }
+.tool-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* 检测结果 */
+.tool-result {
+    margin-bottom: 20px;
+}
+
+.result-summary {
+    display: inline-block;
+    padding: 8px 18px;
+    border-radius: 999px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.result-lines {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.result-lines li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.result-lines .host { word-break: break-all; }
+
+/* 状态徽标 */
+.st {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.st-online        { color: var(--green); border: 1px solid #81c78466; background: rgba(129, 199, 132, 0.1); }
+.st-offline       { color: #e57373; border: 1px solid #e5737366; background: rgba(229, 115, 115, 0.1); }
+.st-local-online  { color: #ffb74d; border: 1px solid #ffb74d66; background: rgba(255, 183, 77, 0.1); }
+.st-local-offline { color: #e57373; border: 1px solid #e5737366; background: rgba(229, 115, 115, 0.1); }
+.st-loopback      { color: var(--blue); border: 1px solid #64b5f666; background: rgba(100, 181, 246, 0.1); }
+
+/* 历史记录 */
+.history-wrap {
+    border-top: 1px solid var(--card-border);
+    padding-top: 16px;
+}
+
+.history-title {
+    font-size: 0.85rem;
+    opacity: 0.7;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.history-list {
+    list-style: none;
+    max-height: 220px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-right: 4px;
+}
+
+.history-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    font-size: 0.85rem;
+}
+
+.history-proto {
+    flex-shrink: 0;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--blue);
+    opacity: 0.9;
+}
+
+.history-host {
+    flex: 1;
+    min-width: 0;
+    word-break: break-all;
+    cursor: pointer;
+}
+
+.history-host:hover { color: var(--blue); }
+
+.history-status {
+    flex-shrink: 0;
+}
+
+.history-time {
+    flex-shrink: 0;
+    font-size: 0.72rem;
+    opacity: 0.5;
+}
+
+.history-del {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    line-height: 1;
+    background: transparent;
+    border: none;
+    color: rgba(232, 240, 243, 0.5);
+    font-size: 0.9rem;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: background 0.15s, color 0.15s;
+}
+
+.history-del:hover {
+    background: rgba(229, 115, 115, 0.2);
+    color: #e57373;
+}
+
+.history-empty {
+    font-size: 0.8rem;
+    opacity: 0.5;
+    padding: 8px 0;
+}
+
+.history-loading {
+    font-size: 0.85rem;
+    opacity: 0.6;
+    padding: 8px 0;
+}
+
+/* Hawkeye：Whois 列表 */
+.whois-result { margin-top: 4px; }
+
+.whois-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.whois-list li {
+    display: flex;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.whois-list .k {
+    flex-shrink: 0;
+    width: 110px;
+    opacity: 0.6;
+}
+
+.whois-list .v {
+    flex: 1;
+    min-width: 0;
+    word-break: break-all;
+    color: var(--text-color);
+}
+
+.whois-list .ns-item {
+    display: inline-block;
+    margin: 2px 6px 2px 0;
+    padding: 2px 10px;
+    background: rgba(100, 181, 246, 0.12);
+    border-radius: 999px;
+    font-size: 0.8rem;
+}
+
+.whois-empty {
+    font-size: 0.85rem;
+    opacity: 0.6;
+    padding: 8px 0;
+}
+
+/* 天隼：IP 显示 */
+.ip-btn { margin-bottom: 24px; }
+
+.ip-result {
+    text-align: center;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px dashed var(--card-border);
+    border-radius: 12px;
+}
+
+.ip-placeholder {
+    font-size: 0.9rem;
+    opacity: 0.5;
+}
+
+.ip-value {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    background: var(--accent-grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 12px;
+    word-break: break-all;
+}
+
+.ip-meta {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}

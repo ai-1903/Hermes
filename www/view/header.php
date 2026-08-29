@@ -9,12 +9,14 @@
  *
  * 约定：
  *   - $siteName   站点名称（可选，默认 "Hermes"）
+ *   - $nav        导航结构数组（可选；支持 children 二级菜单）
  *   - $pageTitle  页面标题（可选，默认 "Hermes"）
  *   - $pageStyles 页面专属 CSS 路径数组（相对站点根）
  *   - $pageScripts 页面专属 JS 路径数组（相对站点根）
  */
 
 $siteName    = $siteName    ?? 'Hermes';
+$nav         = $nav         ?? [];
 $pageTitle   = $pageTitle   ?? 'Hermes';
 $pageStyles  = $pageStyles  ?? [];
 $pageScripts = $pageScripts ?? [];
@@ -45,7 +47,26 @@ $pageScripts = $pageScripts ?? [];
     <div class="container">
         <a class="brand" href="index.php"><?= htmlspecialchars($siteName, ENT_QUOTES, 'UTF-8') ?></a>
         <nav class="nav">
-            <a href="index.php">首页</a>
+            <?php foreach ($nav as $item): ?>
+                <?php if (!empty($item['children'])): ?>
+                    <div class="nav-item dropdown">
+                        <a class="nav-link" href="javascript:void(0)">
+                            <?= htmlspecialchars($item['label'], ENT_QUOTES, 'UTF-8') ?><span class="caret">▾</span>
+                        </a>
+                        <div class="dropdown-menu">
+                            <?php foreach ($item['children'] as $child): ?>
+                                <a href="<?= htmlspecialchars($child['href'], ENT_QUOTES, 'UTF-8') ?>">
+                                    <?= htmlspecialchars($child['label'], ENT_QUOTES, 'UTF-8') ?>
+                                </a>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <a class="nav-link" href="<?= htmlspecialchars($item['href'], ENT_QUOTES, 'UTF-8') ?>">
+                        <?= htmlspecialchars($item['label'], ENT_QUOTES, 'UTF-8') ?>
+                    </a>
+                <?php endif; ?>
+            <?php endforeach; ?>
         </nav>
     </div>
 </header>
