@@ -55,6 +55,40 @@ return [
                         ],
                     ],
                 ],
+                [
+                    'title' => 'Aegis',
+                    'intro' => [
+                        'Aegis 安全检测栏目为你提供网络与数据安全的体检工具。',
+                        '从多维度智能风险检测，到连接安全与数据传输安全评估，',
+                        '帮助你了解当前的网络环境是否值得信赖。',
+                    ],
+                    'links' => [
+                        [
+                            'label' => '概览',
+                            'href'  => 'aegis-overview.php',
+                            'desc'  => 'Aegis 安全检测分类总览',
+                            'icon'  => 'fluent:apps-20-regular',
+                        ],
+                        [
+                            'label' => '智能检测',
+                            'href'  => 'aegis-intelligent.php',
+                            'desc'  => '多维安全信号智能分析',
+                            'icon'  => 'fluent:sparkle-20-regular',
+                        ],
+                        [
+                            'label' => '连接安全检测',
+                            'href'  => 'aegis-connection.php',
+                            'desc'  => '我的网络安全吗？',
+                            'icon'  => 'fluent:globe-shield-20-regular',
+                        ],
+                        [
+                            'label' => '数据安全检测',
+                            'href'  => 'aegis-data.php',
+                            'desc'  => '我的数据会被窃听吗？',
+                            'icon'  => 'fluent:lock-20-regular',
+                        ],
+                    ],
+                ],
             ],
         ],
         [

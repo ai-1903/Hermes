@@ -1,0 +1,44 @@
+/* ==========================================================================
+   aegis.css — Aegis 安全检测栏目样式
+   类别：页面（aegis-* 页面专属）
+   ========================================================================== */
+
+/* ---------- 智能检测占位页：四芒星「额外」特效 ----------
+   相比其它普通占位页，智能检测页的四芒星图标带旋转 + 辉光脉冲，
+   营造「正在扫描 / 待命侦测」的科幻感。 */
+.placeholder-card--sparkle .placeholder-icon {
+    display: inline-block;
+    animation: aegis-spin 7s linear infinite,
+               aegis-pulse 2.2s ease-in-out infinite;
+}
+
+.placeholder-card--sparkle .placeholder-icon iconify-icon {
+    filter: drop-shadow(0 0 14px rgba(34, 211, 238, 0.75))
+            drop-shadow(0 0 30px rgba(34, 211, 238, 0.35));
+}
+
+/* 卡片描边辉光随脉冲微动 */
+.placeholder-card--sparkle {
+    animation: aegis-card-glow 2.2s ease-in-out infinite;
+}
+
+@keyframes aegis-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+@keyframes aegis-pulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.12); }
+}
+
+@keyframes aegis-card-glow {
+    0%, 100% { border-color: rgba(34, 211, 238, 0.28); box-shadow: 0 0 18px rgba(34, 211, 238, 0.18); }
+    50%      { border-color: rgba(34, 211, 238, 0.55); box-shadow: 0 0 30px rgba(34, 211, 238, 0.32); }
+}
+
+/* 尊重系统的减弱动态效果偏好 */
+@media (prefers-reduced-motion: reduce) {
+    .placeholder-card--sparkle .placeholder-icon,
+    .placeholder-card--sparkle { animation: none; }
+}

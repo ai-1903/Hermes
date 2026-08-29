@@ -7,14 +7,16 @@
  *      样式来自 resources/css/placeholder.css，不书写内联样式。
  *
  * 约定：
- *   - $phIcon   占位图标（iconify:fluent 线性变体）
- *   - $phName   工具名称
- *   - $phDesc   工具描述（可选）
+ *   - $phIcon       占位图标（iconify:fluent 线性变体）
+ *   - $phName       工具名称
+ *   - $phDesc       工具描述（可选）
+ *   - $phCardClass  卡片追加类（可选，用于页面级额外效果）
  * 由调用方先定义这些变量，再 require 本文件。
  */
+$phCardClass = $phCardClass ?? '';
 ?>
 <main class="placeholder-main">
-    <div class="placeholder-card">
+    <div class="placeholder-card <?= htmlspecialchars($phCardClass, ENT_QUOTES, 'UTF-8') ?>">
         <iconify-icon class="placeholder-icon" icon="<?= htmlspecialchars($phIcon ?? 'fluent:toolbox-20-regular', ENT_QUOTES, 'UTF-8') ?>"></iconify-icon>
         <h1 class="placeholder-title"><?= htmlspecialchars($phName ?? '', ENT_QUOTES, 'UTF-8') ?></h1>
         <?php if (!empty($phDesc)): ?>
