@@ -62,9 +62,14 @@
          */
         function setHeightToContent() {
             if (!navBar) return;
-            // 先回归「内容撑开」，再读真实内容高度
+            // 记录当前视觉高度作为过渡起点；再置 auto 测量真实内容高度
+            // （容器可能被较长菜单撑高，scrollHeight 会被容器高度「撑住」）
+            var start = navBar.offsetHeight;
             navBar.style.height = 'auto';
             var content = navBar.scrollHeight;
+            // 恢复起点高度并强制回流：过渡从「当前视觉高度」开始（展开动画不丢失）
+            navBar.style.height = start + 'px';
+            void navBar.offsetHeight;
             var max = isMobile() ? window.innerHeight : window.innerHeight * 0.5;
             var h = Math.min(content, max);
             // 高度 < 展开所需时容器内部滚动（需 > 54px 才启用滚动）
