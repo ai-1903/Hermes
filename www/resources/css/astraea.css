@@ -1,0 +1,162 @@
+/* ==========================================================================
+   astraea.css — Astraea 哈希校验页样式
+   类别：页面（astraea.php 专属）
+   布局：页面中间大上传拖放框 + 下方两个可复制输出框
+   ========================================================================== */
+
+.astraea-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px 72px;
+    gap: 36px;
+}
+
+/* ---------- 大上传拖放框 ---------- */
+.as-dropzone {
+    width: 100%;
+    max-width: 640px;
+    min-height: 260px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 40px 24px;
+    border: 2px dashed var(--border);
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.02);
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+.as-dropzone:hover,
+.as-dropzone:focus-visible {
+    border-color: rgba(34, 211, 238, 0.5);
+    background: rgba(34, 211, 238, 0.04);
+}
+
+.as-dropzone.dragging {
+    border-color: var(--accent);
+    background: rgba(34, 211, 238, 0.08);
+    box-shadow: 0 0 40px rgba(34, 211, 238, 0.18);
+    transform: scale(1.01);
+}
+
+.as-dropzone > iconify-icon {
+    font-size: 3.4rem;
+    color: var(--accent);
+    filter: drop-shadow(0 0 14px rgba(34, 211, 238, 0.5));
+}
+
+.as-drop-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.as-drop-sub {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* ---------- 输出区 ---------- */
+.as-outputs {
+    width: 100%;
+    max-width: 640px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    animation: as-in 0.4s ease;
+}
+
+@keyframes as-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.as-file-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--accent);
+    word-break: break-all;
+}
+
+.as-output {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+.as-output-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid var(--border);
+}
+
+.as-output-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+}
+
+.as-output-label iconify-icon { color: var(--accent); font-size: 1rem; }
+
+.as-copy-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s, background 0.15s, box-shadow 0.15s;
+}
+
+.as-copy-btn:hover {
+    color: var(--accent);
+    border-color: rgba(34, 211, 238, 0.4);
+    background: rgba(34, 211, 238, 0.08);
+    box-shadow: 0 0 10px rgba(34, 211, 238, 0.15);
+}
+
+.as-copy-btn.copied {
+    color: var(--green);
+    border-color: rgba(52, 211, 153, 0.4);
+    background: rgba(52, 211, 153, 0.12);
+}
+
+.as-copy-btn iconify-icon { font-size: 0.95rem; }
+
+.as-output-value {
+    width: 100%;
+    padding: 12px 14px;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    outline: none;
+    word-break: break-all;
+}
+
+/* ---------- 移动端 ---------- */
+@media (max-width: 620px) {
+    .astraea-main { padding: 36px 18px 56px; }
+    .as-dropzone { min-height: 200px; padding: 30px 18px; }
+}
