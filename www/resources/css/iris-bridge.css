@@ -175,7 +175,7 @@
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
-/* 复制按钮（圆形本体；桌面悬停时向右滑出两个胶囊，绝对定位不推挤主内容） */
+/* 复制按钮（圆形本体；桌面悬停时原位刷新为两个胶囊，绝对定位不推挤主内容） */
 .ir-copy {
     position: relative;
     flex-shrink: 0;
@@ -184,7 +184,7 @@
 }
 
 /* 按钮本体：固定 30px 圆形图标（不因展开改变尺寸 → 不推挤行内其它元素）
-   悬停时淡出隐藏，让位于右侧的双按钮组 */
+   悬停时仅淡出图标（保留盒模型 → hover 区域不丢失、不死循环） */
 .ir-copy-btn {
     display: flex;
     align-items: center;
@@ -198,16 +198,17 @@
     color: var(--text-secondary);
     cursor: pointer;
     transition: border-color 0.15s, color 0.15s, background 0.15s, box-shadow 0.15s,
-                opacity 0.18s, visibility 0.18s;
+                opacity 0.18s;
 }
 
 .ir-copy-btn iconify-icon { font-size: 1rem; }
 
-/* 胶囊菜单：绝对定位到按钮右侧（视觉上按钮向右伸展），不占布局、不推挤内容 */
+/* 胶囊菜单：绝对定位到图标原位（left:0），双按钮从原位置向右排布；
+   不占文档流、不推挤内容；鼠标无需移动即可点击 */
 .ir-copy-menu {
     position: absolute;
     top: 0;
-    left: 100%;
+    left: 0;
     display: flex;
     align-items: center;
     height: 30px;
@@ -218,7 +219,7 @@
     transition: opacity 0.18s, visibility 0.18s;
 }
 
-/* 两个胶囊选项：相邻贴合，视觉上与按钮连成一体 */
+/* 两个胶囊选项：相邻贴合，视觉上与图标连成一体 */
 .ir-copy-opt {
     display: flex;
     align-items: center;
@@ -236,7 +237,7 @@
     transition: color 0.15s, background 0.15s;
 }
 
-/* 第一个胶囊：左侧无圆角贴合按钮，右侧圆角贴合第二个 */
+/* 第一个胶囊：左侧圆角（独立成首个胶囊） */
 .ir-copy-opt:first-of-type {
     border-left: 1px solid var(--border);
     border-radius: 15px 0 0 15px;
@@ -254,7 +255,8 @@
 
 .ir-copy-opt.copied { color: var(--green); background: rgba(52, 211, 153, 0.16); }
 
-/* 桌面：悬停 / 聚焦时胶囊从按钮右侧滑出，同时单个图标淡出隐藏（变为双按钮） */
+/* 桌面：悬停 / 聚焦时双按钮在原位刷新显示，同时图标淡出（只淡出、不隐藏盒模型
+   → hover 区域持续存在，鼠标不动时不恢复、不闪烁、不死循环） */
 .ir-copy:hover .ir-copy-menu,
 .ir-copy:focus-within .ir-copy-menu {
     opacity: 1;
@@ -265,7 +267,8 @@
 .ir-copy:hover .ir-copy-btn,
 .ir-copy:focus-within .ir-copy-btn {
     opacity: 0;
-    visibility: hidden;
+    /* 禁用图标自身的鼠标事件（避免拦截下方双按钮），但保留 30px 盒模型：
+       父容器 .ir-copy 的 hover 仍持续 → 鼠标不动不恢复、不闪烁、不死循环 */
     pointer-events: none;
 }
 
@@ -349,20 +352,10 @@
         margin-left: calc(44px + 10px);  /* label + gap，对齐输入框组左缘 */
     }
 
-    /* 移动端不需要复制图标：隐藏 */
-    .ir-copy-btn iconify-icon { display: none; }
+    /* 移动端不需要复制图标：彻底隐藏按钮本体（menu 已是兄弟节点） */
+    .ir-copy-btn { display: none; }
 
-    /* 按钮本体撑满：内部只含胶囊菜单（两个胶囊均分） */
-    .ir-copy-btn {
-        width: 100%;
-        height: 32px;
-        border-radius: 16px;
-        justify-content: flex-start;
-        border-color: transparent;       /* 移动端按钮本身不显示边框，由胶囊呈现 */
-        background: transparent;
-    }
-
-    /* 胶囊菜单：移动端转为静态流内、常显（无需悬停） */
+    /* 胶囊菜单：移动端转为静态流内、常显（无需悬停），两个胶囊均分占满 */
     .ir-copy-menu {
         position: static;
         opacity: 1;
