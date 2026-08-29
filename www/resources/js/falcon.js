@@ -64,6 +64,25 @@
         }, Promise.reject());
     }
 
+    /**
+     * 补充 org：主数据源（如 ipapi.co）可能不返回 org，或级联兜底落到
+     * ipify（无 org 字段），导致网络环境「无法判断」。
+     * 这里用 ipinfo.io 二次查询补齐 org / 地区信息。
+     */
+    function enrichOrg(info) {
+        if (info.org) return Promise.resolve(info);
+        return fetch('https://ipinfo.io/json')
+            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+            .then(function (d) {
+                if (!info.org) info.org = d.org || '';
+                if (!info.city) info.city = d.city || '';
+                if (!info.region) info.region = d.region || '';
+                if (!info.country) info.country = d.country || '';
+                return info;
+            })
+            .catch(function () { return info; });
+    }
+
     /* ---------- 运营商通识名称识别字典 ---------- */
     var dictCache = null;
 
@@ -147,7 +166,7 @@
     var ENV_META = {
         'datacenter': { label: '网络环境', value: '数据中心 / 托管', cls: 'env-datacenter', icon: 'fluent:server-20-regular' },
         'home':       { label: '网络环境', value: '家庭 / 移动宽带', cls: 'env-home',       icon: 'fluent:home-20-regular' },
-        'unknown':    { label: '网络环境', value: '无法判断',         cls: 'env-unknown',    icon: 'fluent:question-circle-20-regular' },
+        'unknown':    { label: '网络环境', value: '无法判断（服务商未知）', cls: 'env-unknown', icon: 'fluent:question-circle-20-regular' },
     };
 
     /* ---------- 标签渲染 ---------- */
@@ -269,17 +288,19 @@
         });
     }
 
-    /* ---------- 初始化（自动获取 + 字典识别） ---------- */
+    /* ---------- 初始化（自动获取 + 补充 org + 字典识别） ---------- */
     function init() {
         renderHistory();
 
-        // 并行：加载字典 + 获取 IP
+        // 并行：加载字典 + 获取 IP（随后补充 org，避免「无法判断」）
         Promise.all([loadDict(), query()]).then(function (res) {
             var dict = res[0];
             var info = res[1];
-            renderHero(info, dict);
-            upsertHistory(info.ip || '—');
-            renderHistory();
+            return enrichOrg(info).then(function (enriched) {
+                renderHero(enriched, dict);
+                upsertHistory(enriched.ip || '—');
+                renderHistory();
+            });
         }).catch(function () {
             ipEl.classList.remove('loading');
             ipEl.textContent = '获取失败';

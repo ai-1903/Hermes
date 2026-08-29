@@ -2,15 +2,17 @@
  * app.js — 公共脚本入口
  * 类别：全局 / 公共
  * 职责：
- *   - Mega 菜单交互：桌面端 hover 展开 / 点击切换
- *   - 移动端汉堡菜单：点击展开一级菜单，有二级菜单的项点击后展开子级
+ *   - 子菜单面板（.dropdown-menu）与一级项（.nav-item.dropdown）经 data-menu 关联，
+ *     点击 / 悬停开合；面板与菜单栏是平级块（无父子关系）
+ *   - 移动端汉堡菜单：点击展开一级菜单，二级菜单在其内展开
+ *   - 菜单展开时联动全局模糊遮罩（.nav-overlay）
  *   - 点击外部 / Esc 关闭
- * 说明：移动端（≤820px）禁用 hover 展开，避免触摸设备误触。
  */
 (function () {
     'use strict';
 
     var MOBILE_WIDTH = 820;
+    var closeTimer = null;
 
     function isMobile() {
         return window.innerWidth <= MOBILE_WIDTH;
@@ -19,24 +21,51 @@
     document.addEventListener('DOMContentLoaded', function () {
         var hamburger = document.querySelector('.hamburger');
         var nav = document.getElementById('site-nav');
-        var dropdowns = Array.prototype.slice.call(
+        var overlay = document.querySelector('.nav-overlay');
+
+        // 收集：{ item, btn, panel }
+        var entries = Array.prototype.slice.call(
             document.querySelectorAll('.nav-item.dropdown')
-        );
+        ).map(function (item) {
+            var btn = item.querySelector('.nav-btn');
+            var panel = btn ? document.getElementById(btn.getAttribute('data-menu')) : null;
+            return { item: item, btn: btn, panel: panel };
+        }).filter(function (e) { return e.btn; });
+
+        function setOpen(entry, open) {
+            entry.item.classList.toggle('open', open);
+            entry.btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+            if (entry.panel) entry.panel.classList.toggle('open', open);
+        }
 
         function closeAll(except) {
-            dropdowns.forEach(function (d) {
-                if (d !== except) {
-                    d.classList.remove('open');
-                    var b = d.querySelector('.nav-btn');
-                    if (b) b.setAttribute('aria-expanded', 'false');
-                }
+            entries.forEach(function (e) {
+                if (e !== except) setOpen(e, false);
             });
         }
 
-        function closeNav() {
-            closeAll();
-            if (nav) nav.classList.remove('open');
-            if (hamburger) hamburger.setAttribute('aria-expanded', 'false');
+        function syncOverlay() {
+            var any = entries.some(function (e) {
+                return e.item.classList.contains('open');
+            }) || (nav && nav.classList.contains('open'));
+            if (overlay) overlay.classList.toggle('show', any);
+        }
+
+        function cancelClose() {
+            if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
+        }
+
+        function closeAllDelayed() {
+            cancelClose();
+            closeTimer = setTimeout(function () {
+                closeAll();
+                syncOverlay();
+            }, 140);
+        }
+
+        function refresh() {
+            cancelClose();
+            syncOverlay();
         }
 
         /* ---------- 汉堡按钮：开合导航面板 ---------- */
@@ -46,46 +75,68 @@
                 var open = nav.classList.toggle('open');
                 hamburger.setAttribute('aria-expanded', open ? 'true' : 'false');
                 if (!open) closeAll();
+                syncOverlay();
             });
         }
 
-        dropdowns.forEach(function (d) {
-            var btn = d.querySelector('.nav-btn');
-
-            // 点击切换（移动端展开二级菜单 / 触屏）
-            btn.addEventListener('click', function (e) {
+        /* ---------- 子菜单：点击 / 悬停开合（面板与菜单栏平级） ---------- */
+        entries.forEach(function (entry) {
+            // 点击切换（移动端展开二级 / 触屏）
+            entry.btn.addEventListener('click', function (e) {
                 e.stopPropagation();
-                var isOpen = d.classList.toggle('open');
-                btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-                closeAll(d);
+                var isOpen = !entry.item.classList.contains('open');
+                closeAll();
+                setOpen(entry, isOpen);
+                syncOverlay();
             });
 
-            // 悬停展开（仅桌面端，避免移动端触摸误触）
-            d.addEventListener('mouseenter', function () {
-                if (isMobile()) return;
-                closeAll(d);
-                d.classList.add('open');
-                btn.setAttribute('aria-expanded', 'true');
+            // 悬停展开（仅桌面端；hover 到面板时保持展开）
+            if (!isMobile()) {
+                entry.item.addEventListener('mouseenter', function () {
+                    cancelClose();
+                    closeAll();
+                    setOpen(entry, true);
+                    syncOverlay();
+                });
+                entry.item.addEventListener('mouseleave', closeAllDelayed);
+                if (entry.panel) {
+                    entry.panel.addEventListener('mouseenter', refresh);
+                    entry.panel.addEventListener('mouseleave', closeAllDelayed);
+                }
+            }
+        });
+
+        /* ---------- 遮罩点击 / 外部点击 / Esc 关闭 ---------- */
+        if (overlay) {
+            overlay.addEventListener('click', function () {
+                closeAll();
+                if (nav) { nav.classList.remove('open'); }
+                if (hamburger) hamburger.setAttribute('aria-expanded', 'false');
+                syncOverlay();
             });
-            d.addEventListener('mouseleave', function () {
-                if (isMobile()) return;
-                d.classList.remove('open');
-                btn.setAttribute('aria-expanded', 'false');
-            });
+        }
+        document.addEventListener('click', function (e) {
+            if (nav && nav.contains(e.target)) return;
+            if (overlay && e.target === overlay) return;
+            if (e.target.closest && e.target.closest('.dropdown-menu')) return;
+            closeAll();
+            if (nav) nav.classList.remove('open');
+            if (hamburger) hamburger.setAttribute('aria-expanded', 'false');
+            syncOverlay();
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                closeAll();
+                if (nav) nav.classList.remove('open');
+                if (hamburger) hamburger.setAttribute('aria-expanded', 'false');
+                syncOverlay();
+            }
         });
 
         // 窗口尺寸变化：回到桌面时重置面板状态
         window.addEventListener('resize', function () {
             if (!isMobile() && nav) nav.classList.remove('open');
-        });
-
-        // 点击导航外区域关闭
-        document.addEventListener('click', function (e) {
-            if (nav && nav.contains(e.target)) return;
-            closeNav();
-        });
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') closeNav();
+            if (!isMobile() && hamburger) hamburger.setAttribute('aria-expanded', 'false');
         });
     });
 })();

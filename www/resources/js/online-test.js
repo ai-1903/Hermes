@@ -182,8 +182,7 @@
 
     /* ---------- 结果渲染（普通/根域，表格） ---------- */
     function renderTable(items) {
-        result.innerHTML = '';
-        if (!items.length) return;
+        if (!items.length) return null;
 
         var wrap = document.createElement('div');
         wrap.className = 'tool-table-wrap';
@@ -226,6 +225,7 @@
 
         wrap.appendChild(table);
         result.appendChild(wrap);
+        return wrap;
     }
 
     /* ---------- 详情展示（解析 IP / 归属地 / 站点名 / SEO / 图标） ---------- */
@@ -260,10 +260,14 @@
         });
     }
 
-    /** 渲染详情卡片（挂在结果表下方） */
+    /**
+     * 渲染详情卡片（挂表格下方）。
+     * 站点名缺失时用目标域名兜底展示，绝不隐藏该行。
+     * @returns {HTMLElement|null} 详情容器（无在线目标时返回 null）
+     */
     function renderDetails(detailsList) {
         var valid = detailsList.filter(Boolean);
-        if (!valid.length) return;
+        if (!valid.length) return null;
         var wrap = document.createElement('div');
         wrap.className = 'ot-details';
         valid.forEach(function (d) {
@@ -286,19 +290,17 @@
             var body = document.createElement('div');
             body.className = 'site-detail-body';
 
-            // 站点名称行
+            // 站点名称行：标题缺失时用域名兜底，不隐藏
             var titleRow = document.createElement('div');
             titleRow.className = 'site-detail-title';
-            if (d.title) {
-                var t = document.createElement('span');
-                t.className = 'site-detail-name';
-                t.textContent = d.title;
-                titleRow.appendChild(t);
-            }
+            var t = document.createElement('span');
+            t.className = 'site-detail-name';
+            t.textContent = d.title || d.target;
+            titleRow.appendChild(t);
             var target = document.createElement('span');
             target.className = 'site-detail-target mono';
-            target.textContent = d.target;
-            titleRow.appendChild(target);
+            target.textContent = d.title ? d.target : '';
+            if (target.textContent) titleRow.appendChild(target);
 
             // SEO 描述
             if (d.description) {
@@ -342,7 +344,7 @@
             card.appendChild(body);
             wrap.appendChild(card);
         });
-        result.appendChild(wrap);
+        return wrap;
     }
 
     function esc(s) {
@@ -376,6 +378,7 @@
         }
         wrap.appendChild(box);
         result.appendChild(wrap);
+        return wrap;
     }
 
     /** 详情卡骨架：圆图标 + 几行文字条 */
@@ -396,22 +399,27 @@
             wrap.appendChild(card);
         }
         result.appendChild(wrap);
+        return wrap;
     }
 
-    /** 用渐显容器包裹并追加内容（骨架渐隐移除） */
-    function appendFadeIn(el) {
-        el.classList.add('fade-in');
-        result.appendChild(el);
-    }
-
-    /** 隐藏骨架屏（添加 .hidden 渐隐，随后移除） */
-    function hideSkeletons() {
-        var skels = result.querySelectorAll('.sk-wrap');
-        skels.forEach(function (sk) {
-            sk.style.transition = 'opacity 0.25s ease';
-            sk.style.opacity = '0';
-            setTimeout(function () { sk.remove(); }, 260);
-        });
+    /**
+     * 就地替换骨架：真实内容以 fade-in 插入骨架前，骨架渐隐后移除。
+     * 与旧方案不同：各处骨架独立替换、独立渐显，「先显示什么，骨架就变换什么」。
+     */
+    function replaceSkeleton(skWrap, realEl) {
+        if (!realEl) {
+            if (skWrap && skWrap.parentNode) skWrap.remove();
+            return;
+        }
+        realEl.classList.add('fade-in');
+        if (skWrap && skWrap.parentNode) {
+            skWrap.parentNode.insertBefore(realEl, skWrap);
+            skWrap.style.transition = 'opacity 0.2s ease';
+            skWrap.style.opacity = '0';
+            setTimeout(function () { skWrap.remove(); }, 220);
+        } else {
+            result.appendChild(realEl);
+        }
     }
 
     /**
@@ -553,10 +561,10 @@
 
         btn.disabled = true;
 
-        // 先渲染流光骨架屏（表格 + 详情卡占位），数据就绪后再渐显真实内容
+        // 先渲染流光骨架屏（表格 + 详情卡占位），数据就绪后逐块就地替换
         result.innerHTML = '';
-        renderTableSkeleton(hosts.length);
-        renderDetailSkeleton(hosts.length);
+        var tableSk = renderTableSkeleton(hosts.length);
+        var detailSk = renderDetailSkeleton(hosts.length);
 
         Promise.all(hosts.map(function (h) {
             return N.detectStatus(currentProto, h, port).then(function (res) {
@@ -564,21 +572,13 @@
             });
         })).then(function (items) {
             btn.disabled = false;
-            // 骨架渐隐
-            hideSkeletons();
-            // 内容渐显
-            var tableWrap = document.createElement('div');
-            renderTable(items);
-            var lastTable = result.lastElementChild;
-            if (lastTable && lastTable.classList.contains('tool-table-wrap')) {
-                lastTable.classList.add('fade-in');
-            }
+            // 探测数据到达：仅替换表格骨架；详情骨架保留，等待详情数据
+            replaceSkeleton(tableSk, renderTable(items));
+
             // 在线目标：抓取解析 IP / 归属地 / 站点名 / SEO / 图标
             Promise.all(items.map(fetchDetails)).then(function (details) {
-                renderDetails(details);
-                // 详情卡渐显
-                var detailsEl = result.querySelector('.ot-details');
-                if (detailsEl) detailsEl.classList.add('fade-in');
+                // 详情数据到达：替换详情骨架（站点名缺失时用域名兜底，不隐藏）
+                replaceSkeleton(detailSk, renderDetails(details));
             });
             var t = now();
             if (isRoot && !port) {

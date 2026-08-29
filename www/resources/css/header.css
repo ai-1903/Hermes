@@ -1,6 +1,8 @@
 /* ==========================================================================
    header.css — 公共头部组件（深色毛玻璃导航 + 全宽 Mega 菜单）
-   类别：组件（site-header / brand / nav / dropdown）
+   类别：组件（site-header / brand / nav / dropdown / overlay）
+   结构：.dropdown-menu 是 .header-inner 下的独立块（与 .nav 平级），
+         由 JS 以 data-menu 关联开合；展开时铺全局模糊遮罩。
    ========================================================================== */
 
 .site-header {
@@ -37,7 +39,7 @@
     filter: drop-shadow(0 0 6px rgba(34, 211, 238, 0.6));
 }
 
-/* 导航条 */
+/* 导航条（一级菜单栏） */
 .nav {
     display: flex;
     align-items: center;
@@ -88,7 +90,6 @@
     transform: rotate(225deg) translateY(-1px);
 }
 
-/* 全宽 Mega 菜单：导航栏全栏向下展开 */
 .nav-item.dropdown {
     position: static;
     height: 100%;
@@ -96,13 +97,18 @@
     align-items: center;
 }
 
+/* ==========================================================================
+   子菜单面板（header-inner 下的独立块，与 .nav 平级）
+   定位：absolute，相对 .site-header（sticky）→ 全栏向下展开
+   ========================================================================== */
 .dropdown-menu {
     position: absolute;
     top: 100%;
     left: 0;
     right: 0;
     z-index: 999;
-    background: rgba(10, 16, 26, 0.9);
+    /* 半透明底：让 blur + saturate 效果真正可见 */
+    background: rgba(10, 16, 26, 0.62);
     -webkit-backdrop-filter: saturate(180%) blur(23px);
     backdrop-filter: saturate(180%) blur(23px);
     border-bottom: 1px solid rgba(34, 211, 238, 0.15);
@@ -114,27 +120,7 @@
     transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s;
 }
 
-/* 汉堡按钮（仅移动端显示） */
-.hamburger {
-    display: none;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    background: none;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    color: var(--text);
-    font-size: 1.3rem;
-    cursor: pointer;
-    transition: border-color 0.2s, color 0.2s;
-}
-
-.hamburger:hover { border-color: var(--accent); color: var(--accent); }
-.hamburger[aria-expanded="true"] { border-color: var(--accent); color: var(--accent); }
-
-.nav-item.dropdown:hover .dropdown-menu,
-.nav-item.dropdown.open .dropdown-menu {
+.dropdown-menu.open {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
@@ -191,6 +177,47 @@
 }
 
 /* ==========================================================================
+   全局模糊遮罩（菜单展开时，位于菜单栏与页面之间）
+   ========================================================================== */
+.nav-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 997;                 /* 低于 header(1000)，高于页面内容 */
+    background: rgba(2, 6, 12, 0.42);
+    -webkit-backdrop-filter: saturate(140%) blur(8px);
+    backdrop-filter: saturate(140%) blur(8px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.nav-overlay.show {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* 汉堡按钮（仅移动端显示） */
+.hamburger {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+}
+
+.hamburger:hover { border-color: var(--accent); color: var(--accent); }
+.hamburger[aria-expanded="true"] { border-color: var(--accent); color: var(--accent); }
+
+/* ==========================================================================
    移动端（≤820px）：一级菜单收进汉堡按钮；二级菜单在汉堡面板内展开
    ========================================================================== */
 @media (max-width: 820px) {
@@ -198,13 +225,13 @@
 
     .hamburger { display: inline-flex; }
 
-    /* 汉堡展开面板（覆盖在全宽下） */
+    /* 汉堡展开面板 */
     .nav {
         position: absolute;
         top: 100%;
         left: 0;
         right: 0;
-        z-index: 999;
+        z-index: 998;
         flex-direction: column;
         align-items: stretch;
         background: rgba(10, 16, 26, 0.95);
@@ -219,7 +246,6 @@
 
     .nav.open { display: flex; }
 
-    /* 一级项：整行可点 */
     .nav .nav-link,
     .nav-btn {
         width: 100%;
@@ -230,7 +256,7 @@
         text-align: left;
     }
 
-    /* 移动端 dropdown：列表项，点击展开二级 */
+    /* 移动端 dropdown：点击后显示子菜单面板（覆盖在汉堡面板之上） */
     .nav-item.dropdown {
         display: flex;
         flex-direction: column;
@@ -239,17 +265,12 @@
     }
 
     .dropdown-menu {
-        position: static;
-        opacity: 1;
-        visibility: visible;
-        transform: none;
-        box-shadow: none;
-        border-bottom: none;
-        padding: 0 0 8px;
-        display: none;
+        top: 100%;
+        left: 0;
+        right: 0;
+        z-index: 1001;             /* 高于汉堡面板(998)，在汉堡菜单里展开 */
+        padding: 14px 0 20px;
     }
-
-    .nav-item.dropdown.open .dropdown-menu { display: block; }
 
     .dropdown-groups { grid-template-columns: 1fr; gap: 14px; }
 
