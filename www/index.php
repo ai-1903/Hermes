@@ -1,16 +1,15 @@
 <?php
 /**
- * index.php — 首页（入口视图，科幻极简风）
+ * index.php — 首页（介绍落地页，科幻极简风）
  *
  * 分层：view 入口（展示）
- * 职责：Hero 区 + 工具入口卡片。数据来自 system/App，样式来自 resources/css，
- *       图标使用 iconify:fluent（线性），遵守 AGENTS.md 铁律：PHP 内不书写内联 CSS / JS。
+ * 职责：品牌介绍落地页——Hero 标语 + 简短特性 + 引导 CTA，不展示全功能模块。
+ *       数据来自 system/App，样式来自 resources/css，图标使用 iconify:fluent。
  */
 require __DIR__ . '/system/App.php';
 
 $app    = App::home();
 $footer = App::footer();
-$nav    = App::config()['nav'];
 
 $siteName    = $app['title'];
 $pageTitle   = $app['title'] . ' — 首页';
@@ -19,34 +18,39 @@ $pageScripts = [];
 
 require __DIR__ . '/view/header.php';
 ?>
-<main class="site-main">
-    <div class="hero">
-        <iconify-icon class="hero-icon" icon="fluent:rocket-20-regular"></iconify-icon>
-        <h1><?= htmlspecialchars($app['title'], ENT_QUOTES, 'UTF-8') ?></h1>
-        <p class="hero-sub">简约、高效的网络工具集。在线检测、Whois 查询、公网 IP 定位，全部在浏览器本地完成。</p>
-        <a class="hero-cta" href="online-test.php">
-            <iconify-icon class="cta-icon" icon="fluent:arrow-right-20-regular"></iconify-icon>
-            开始使用网络工具
-        </a>
+<main class="landing-main">
 
-        <div class="entry-grid">
-            <?php foreach ($nav as $item): ?>
-                <?php if (!empty($item['groups'])): ?>
-                    <?php foreach ($item['groups'] as $group): ?>
-                        <?php foreach ($group['links'] as $link): ?>
-                            <a class="entry-card" href="<?= htmlspecialchars($link['href'], ENT_QUOTES, 'UTF-8') ?>">
-                                <iconify-icon icon="<?= htmlspecialchars($link['icon'], ENT_QUOTES, 'UTF-8') ?>"></iconify-icon>
-                                <span>
-                                    <div class="entry-card-title"><?= htmlspecialchars($link['label'], ENT_QUOTES, 'UTF-8') ?></div>
-                                    <div class="entry-card-desc"><?= htmlspecialchars($link['desc'] ?? '', ENT_QUOTES, 'UTF-8') ?></div>
-                                </span>
-                            </a>
-                        <?php endforeach; ?>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            <?php endforeach; ?>
+    <div class="landing-hero">
+        <iconify-icon class="hero-icon" icon="fluent:rocket-20-regular"></iconify-icon>
+        <h1 class="hero-title"><?= htmlspecialchars($siteName, ENT_QUOTES, 'UTF-8') ?></h1>
+        <p class="hero-sub">简约、高效、注重隐私的网络工具集。<br>在线检测、Whois 查询、安全评估与更多，全部在浏览器本地完成。</p>
+        <div class="hero-actions">
+            <a class="hero-cta" href="online-test.php">
+                <iconify-icon icon="fluent:arrow-right-20-regular"></iconify-icon>
+                开始探索
+            </a>
         </div>
     </div>
+
+    <!-- 特性简介（落地页，非功能模块入口） -->
+    <section class="landing-features">
+        <div class="feature">
+            <iconify-icon icon="fluent:shield-lock-20-regular"></iconify-icon>
+            <div class="feature-title">隐私优先</div>
+            <div class="feature-desc">核心工具全部在浏览器本地运行，数据不上传，检测结果不落服务器。</div>
+        </div>
+        <div class="feature">
+            <iconify-icon icon="fluent:flash-20-regular"></iconify-icon>
+            <div class="feature-title">极速响应</div>
+            <div class="feature-desc">轻量纯前端实现，无需等待，随开随用。</div>
+        </div>
+        <div class="feature">
+            <iconify-icon icon="fluent:apps-20-regular"></iconify-icon>
+            <div class="feature-title">工具集</div>
+            <div class="feature-desc">网络检测、安全评估、编解码、色彩转换与哈希校验，一站式汇聚。</div>
+        </div>
+    </section>
+
 </main>
 <?php
 $copyright     = $footer['copyright'];

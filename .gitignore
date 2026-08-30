@@ -43,10 +43,16 @@ env/
 .env.*
 !.env.example
 
+# PHP
+vendor/
+composer.lock
+.phpunit.result.cache
+*.log
+
 # 其他
 tmp/
 temp/
 *.tmp
 
-# 运行时缓存（dns-lookup.php 服务端解析缓存）
+# 运行时缓存（dns-lookup.php / tls-check.php 服务端缓存）
 www/data/cache/

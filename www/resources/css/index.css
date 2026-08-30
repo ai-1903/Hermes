@@ -1,31 +1,33 @@
 /* ==========================================================================
-   index.css — 首页页面样式（科幻风 Hero + 功能入口）
+   index.css — 首页页面样式（介绍落地页，科幻极简风）
    类别：页面（index.php 专属）
    ========================================================================== */
 
-.site-main {
+.landing-main {
     flex: 1;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 48px 24px;
+    padding: 56px 24px 72px;
     position: relative;
 }
 
 /* 顶部青色光晕装饰 */
-.site-main::before {
+.landing-main::before {
     content: '';
     position: absolute;
     top: -80px;
     left: 50%;
     transform: translateX(-50%);
-    width: 640px;
-    height: 320px;
-    background: radial-gradient(50% 50% at 50% 50%, rgba(34, 211, 238, 0.10), transparent 70%);
+    width: 680px;
+    height: 340px;
+    background: radial-gradient(50% 50% at 50% 50%, rgba(34, 211, 238, 0.12), transparent 70%);
     pointer-events: none;
 }
 
-.hero {
+/* ---------- Hero ---------- */
+.landing-hero {
     max-width: 760px;
     text-align: center;
     position: relative;
@@ -33,80 +35,105 @@
 }
 
 .hero-icon {
-    font-size: 3.2rem;
+    font-size: 3.4rem;
     color: var(--accent);
-    margin-bottom: 16px;
-    filter: drop-shadow(0 0 12px rgba(34, 211, 238, 0.5));
+    margin-bottom: 18px;
+    filter: drop-shadow(0 0 14px rgba(34, 211, 238, 0.55));
 }
 
-.hero h1 {
-    font-size: clamp(2rem, 5vw, 3.4rem);
-    font-weight: 700;
+.hero-title {
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    font-weight: 800;
     letter-spacing: -0.02em;
-    line-height: 1.1;
+    line-height: 1.08;
+    color: #eaf6ff;
+    text-shadow: 0 0 30px rgba(34, 211, 238, 0.3);
 }
 
 .hero-sub {
-    margin: 14px auto 34px;
-    font-size: 1.05rem;
+    margin: 18px auto 34px;
+    font-size: 1.08rem;
     color: var(--text-secondary);
-    max-width: 520px;
+    max-width: 560px;
+    line-height: 1.8;
+}
+
+.hero-actions {
+    display: flex;
+    justify-content: center;
 }
 
 .hero-cta {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 12px 30px;
+    padding: 13px 34px;
     border-radius: var(--radius-pill);
     background: linear-gradient(135deg, var(--accent), var(--accent-strong));
     color: #04121a;
     font-weight: 700;
-    font-size: 0.95rem;
+    font-size: 0.98rem;
     text-decoration: none;
-    box-shadow: 0 0 20px rgba(34, 211, 238, 0.25);
-    transition: filter 0.2s, box-shadow 0.2s;
+    box-shadow: 0 0 22px rgba(34, 211, 238, 0.28);
+    transition: filter 0.2s, box-shadow 0.2s, transform 0.15s;
 }
 
 .hero-cta:hover {
     filter: brightness(1.12);
-    box-shadow: 0 0 30px rgba(34, 211, 238, 0.4);
+    box-shadow: 0 0 34px rgba(34, 211, 238, 0.42);
+    transform: translateY(-1px);
 }
 
-.hero-cta .cta-icon { vertical-align: -0.15em; }
-
-/* 功能入口卡片 */
-.entry-grid {
-    margin-top: 48px;
+/* ---------- 特性简介（落地页） ---------- */
+.landing-features {
+    margin-top: 64px;
+    max-width: 900px;
+    width: 100%;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
-    text-align: left;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    position: relative;
+    z-index: 1;
 }
 
-.entry-card {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 18px 20px;
+.feature {
+    padding: 26px 22px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
-    text-decoration: none;
-    color: var(--text);
-    transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+    text-align: center;
+    transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
 }
 
-.entry-card:hover {
-    transform: translateY(-2px);
+.feature:hover {
     border-color: rgba(34, 211, 238, 0.35);
-    box-shadow: 0 0 22px rgba(34, 211, 238, 0.12);
+    box-shadow: 0 0 24px rgba(34, 211, 238, 0.12);
+    transform: translateY(-3px);
 }
 
-.entry-card iconify-icon { font-size: 26px; color: var(--accent); flex-shrink: 0; }
+.feature iconify-icon {
+    font-size: 2rem;
+    color: var(--accent);
+    margin-bottom: 12px;
+    filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.4));
+}
 
-.entry-card-title { font-size: 0.98rem; font-weight: 600; }
+.feature-title {
+    font-size: 1.02rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
 
-.entry-card-desc { font-size: 0.8rem; color: var(--text-secondary); }
+.feature-desc {
+    font-size: 0.84rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* ---------- 移动端 ---------- */
+@media (max-width: 720px) {
+    .landing-main { padding: 40px 18px 56px; }
+    .landing-features { grid-template-columns: 1fr; gap: 14px; }
+}
