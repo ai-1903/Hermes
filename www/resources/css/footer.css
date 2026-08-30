@@ -23,3 +23,31 @@
 }
 
 .copyright a:hover { color: var(--accent); }
+
+/* 仓库链接（iCerya Open） */
+.repo-link {
+    margin-top: 8px;
+}
+
+.repo-link a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: border-color 0.2s, color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+
+.repo-link a:hover {
+    color: var(--accent);
+    border-color: rgba(34, 211, 238, 0.4);
+    background: rgba(34, 211, 238, 0.06);
+    box-shadow: 0 0 14px rgba(34, 211, 238, 0.15);
+}
+
+.repo-link iconify-icon { font-size: 1rem; }

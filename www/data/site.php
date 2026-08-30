@@ -146,5 +146,6 @@ return [
     'copyright' => [
         'holder' => 'iCerya',
         'url'    => 'https://icerya.com',
+        'repo'   => 'https://github.com/ai-1903/Hermes',
     ],
 ];

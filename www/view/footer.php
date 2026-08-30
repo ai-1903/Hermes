@@ -7,7 +7,7 @@
  *       样式由 resources/css/footer.css 提供，此处不书写任何内联样式。
  *
  * 约定：
- *   - $copyright     版权署名信息数组（holder 署名 / url 链接）
+ *   - $copyright     版权署名信息数组（holder 署名 / url 链接 / repo 仓库链接）
  *   - $copyrightYear 版权年份（可选，默认当前年份）
  */
 
@@ -23,6 +23,15 @@ $copyrightYear = $copyrightYear ?? date('Y');
                 <?= htmlspecialchars($copyright['holder'], ENT_QUOTES, 'UTF-8') ?>
             </a>
         </p>
+        <?php if (!empty($copyright['repo'])): ?>
+        <p class="repo-link">
+            <a href="<?= htmlspecialchars($copyright['repo'], ENT_QUOTES, 'UTF-8') ?>"
+               target="_blank" rel="noopener">
+                <iconify-icon icon="fluent:code-20-regular"></iconify-icon>
+                iCerya Open
+            </a>
+        </p>
+        <?php endif; ?>
     </div>
 </footer>
 </body>

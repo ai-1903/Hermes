@@ -1,26 +1,42 @@
-# Hermes
+<div align="center">
 
-> 简约、高效的浏览器端网络工具集。在线检测、Whois 查询、公网 IP 定位、色彩转换、安全检测，全部在浏览器本地完成。
+# 🚀 Hermes
 
-Hermes 是一套部署于 Docker 的 PHP 工具站，核心工具均以**纯前端**方式在浏览器本地运行，不上传数据、不依赖第三方后端，注重隐私与速度。
+**简约 · 高效 · 注重隐私的浏览器端网络工具集**
+
+在线检测 · Whois 查询 · 安全评估 · 色彩转换 · 哈希校验 —— 全部在浏览器本地完成
+
+[![PHP](https://img.shields.io/badge/PHP-8.3-777BB4?style=flat-square&logo=php&logoColor=white)](https://www.php.net/)
+[![Docker](https://img.shields.io/badge/Docker-✓-2496ED?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com/)
+[![Nginx](https://img.shields.io/badge/Nginx-1.27-009639?style=flat-square&logo=nginx&logoColor=white)](https://nginx.org/)
+[![License](https://img.shields.io/badge/License-©%20iCerya-64748b?style=flat-square)](LICENSE)
+[![PRs](https://img.shields.io/badge/PRs-Welcome-22d3ee?style=flat-square)](https://github.com/ai-1903/Hermes/pulls)
+
+---
+
+<img src="docs/screenshot.svg" alt="Hermes 首页" width="780"/>
+
+</div>
+
+Hermes 是一套部署于 Docker 的 PHP 工具站。核心工具均以**纯前端**方式在浏览器本地运行——数据不上传、不依赖第三方后端，注重隐私与速度。
 
 ## ✨ 功能
 
-### 网络检测
+### 🌐 网络检测
 | 工具 | 说明 |
 |---|---|
 | Online Test | 域名 / IP 在线连通性检测 |
 | Hawkeye | Whois 域名信息查询（RDAP） |
 | 天隼 | 公网 IP 与归属、运营商识别 |
 
-### Aegis 安全检测
+### 🛡️ Aegis 安全检测
 | 工具 | 说明 |
 |---|---|
 | 智能检测 | 设备 IP / 连接安全 / 数据安全综合评分报告（可导出图片） |
 | 连接安全检测 | 代理 / Tor-VPN / DNS 泄漏 / 加密 DNS 评估 |
 | 数据安全检测 | 中间人劫持（TLS 指纹）+ 网络环境 + 内网稳定性（多次测量） |
 
-### 实用工具
+### 🧰 实用工具
 | 工具 | 说明 |
 |---|---|
 | Coder | 文本 / base64 / UTF-8 / Unicode / URL 编解码，支持手动指定输入输出类型 |
@@ -64,4 +80,4 @@ www/
 
 ## 📄 License
 
-© iCerya. 保留所有权利。
+© [iCerya](https://icerya.com). 保留所有权利。

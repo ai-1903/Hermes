@@ -56,3 +56,6 @@ temp/
 
 # 运行时缓存（dns-lookup.php / tls-check.php 服务端缓存）
 www/data/cache/
+
+# 工作区开发规范（不上传）
+AGENTS.md
