@@ -20,6 +20,8 @@
 
 Hermes 是一套部署于 Docker 的 PHP 工具站。核心工具均以**纯前端**方式在浏览器本地运行——数据不上传、不依赖第三方后端，注重隐私与速度。
 
+Demo：[Hermes 赫耳墨斯](https://hermes.icerya.com)
+
 ## ✨ 功能
 
 ### 🌐 网络检测
